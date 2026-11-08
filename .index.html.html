@@ -1,0 +1,1316 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>The Intruder</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lalezar&family=Readex+Pro:wght@400;500;600&display=swap">
+<style>
+:root {
+  /* Layout: one column, one phase per screen, passed hand to hand on a single phone.
+     Look: deep tile-blue ground with a faint eight-point star lattice, lemon for actions,
+     role colours (mint / coral / lilac) reserved for the three roles. Single dark look by choice. */
+  --ink: #08222b;
+  --tile: #0f3441;
+  --tile-hi: #17495a;
+  --text: #eaf4f1;
+  --muted: #9bbcbc;
+  --lemon: #f4d35e;
+  --on-lemon: #0a2530;
+  --coral: #ff7a66;
+  --mint: #63d9bb;
+  --lilac: #bba6ff;
+  --f-display: 'Lalezar', 'Segoe UI', Tahoma, sans-serif;
+  --f-body: 'Readex Pro', 'Segoe UI', Tahoma, sans-serif;
+  --lattice: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%23123f4d' stroke-width='1.4'%3E%3Crect x='16' y='16' width='40' height='40'/%3E%3Crect x='16' y='16' width='40' height='40' transform='rotate(45 36 36)'/%3E%3Ccircle cx='36' cy='36' r='6'/%3E%3C/g%3E%3C/svg%3E");
+  --lattice-hi: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%231d5b6e' stroke-width='1.6'%3E%3Crect x='16' y='16' width='40' height='40'/%3E%3Crect x='16' y='16' width='40' height='40' transform='rotate(45 36 36)'/%3E%3Ccircle cx='36' cy='36' r='6'/%3E%3C/g%3E%3C/svg%3E");
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background-color: var(--ink);
+  background-image: var(--lattice);
+  color: var(--text);
+  font: 16px/1.6 var(--f-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 12px 44px;
+  min-height: 100%;
+}
+#app { max-width: 30rem; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+h1, h2, h3, p { margin: 0; }
+h1, h2, h3, .bigname, .word, .verdict strong, .timer output { font-family: var(--f-display); font-weight: 400; text-wrap: balance; }
+:focus-visible { outline: 3px solid var(--lemon); outline-offset: 2px; }
+button, input, textarea { font: inherit; color: inherit; }
+
+/* top bar + settings */
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; }
+.brand { display: flex; align-items: center; gap: 8px; color: var(--lemon); font-family: var(--f-display); font-size: 1.3rem; }
+.gear { min-height: 44px; display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; border: 1.5px solid var(--tile-hi); background: none; padding: 4px 16px; cursor: pointer; }
+.gear[aria-expanded="true"] { background: var(--tile); border-color: var(--lemon); }
+input[type="range"] { width: 100%; min-height: 32px; accent-color: var(--lemon); }
+input[type="range"]:disabled { opacity: .4; }
+.setrow { display: flex; flex-direction: column; gap: 4px; }
+
+/* hero */
+.hero { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+.hero h1 { font-size: 3.4rem; line-height: 1.1; color: var(--lemon); }
+.hero p { color: var(--muted); max-width: 22rem; }
+
+/* rules */
+.rules { background: var(--tile); border-radius: 14px; padding: 4px 16px; }
+.rules summary { cursor: pointer; padding: 12px 0; font-weight: 500; }
+.rules ol { margin: 0; padding-block: 0 14px; padding-inline: 20px 0; color: var(--muted); display: flex; flex-direction: column; gap: 8px; }
+.rules b { color: var(--text); font-weight: 500; }
+
+/* setup panels */
+.panel { background: var(--tile); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+.panel h2 { font-size: 1.35rem; color: var(--lemon); }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.row > span { min-width: 0; }
+.label { font-weight: 500; }
+.sub { font-size: .8125rem; color: var(--muted); }
+.stepper { display: flex; align-items: center; gap: 4px; background: var(--ink); border-radius: 12px; padding: 4px; flex: none; }
+[dir="rtl"] .stepper { flex-direction: row-reverse; }
+.stepper button { width: 44px; height: 44px; border: 0; border-radius: 9px; background: var(--tile-hi); font-size: 1.4rem; cursor: pointer; }
+.stepper button:disabled { opacity: .35; cursor: default; }
+.stepper .val { min-width: 2.6rem; text-align: center; font-family: var(--f-display); font-size: 1.5rem; }
+.names { display: grid; grid-template-columns: 1fr; gap: 8px; }
+@media (min-width: 34rem) { .names { grid-template-columns: 1fr 1fr; } }
+.nm { display: flex; align-items: center; gap: 8px; background: var(--ink); border-radius: 12px; padding-inline: 4px 12px; min-width: 0; }
+.nm i { font-style: normal; width: 28px; height: 28px; border-radius: 50%; background: var(--tile-hi); display: grid; place-items: center; font-size: .8125rem; flex: none; margin-inline-start: 8px; }
+.nm input { flex: 1; min-width: 0; background: none; border: 0; padding: 12px 4px; }
+.nm input::placeholder { color: var(--muted); }
+.switch { width: 52px; height: 30px; border-radius: 15px; border: 0; background: var(--tile-hi); position: relative; cursor: pointer; flex: none; }
+.switch::after { content: ""; position: absolute; top: 4px; inset-inline-start: 4px; width: 22px; height: 22px; border-radius: 50%; background: var(--text); transition: transform .2s; }
+.switch[aria-checked="true"] { background: var(--lemon); }
+.switch[aria-checked="true"]::after { transform: translateX(22px); background: var(--on-lemon); }
+[dir="rtl"] .switch[aria-checked="true"]::after { transform: translateX(-22px); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 2px solid var(--tile-hi); background: none; border-radius: 999px; padding: 6px 16px; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--lemon); border-color: var(--lemon); color: var(--on-lemon); font-weight: 500; }
+.chip.tn[aria-pressed="false"] { border-color: var(--coral); }
+.tools { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.mini { background: none; border: 0; color: var(--muted); text-decoration: underline; cursor: pointer; padding: 8px 6px; }
+textarea { width: 100%; min-height: 96px; resize: vertical; background: var(--ink); border: 0; border-radius: 12px; padding: 12px; line-height: 1.7; }
+textarea::placeholder { color: var(--muted); }
+.err { color: var(--coral); text-align: center; }
+
+/* special roles */
+.spgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr)); gap: 8px; }
+.sp { text-align: start; display: flex; flex-direction: column; gap: 2px; border: 2px solid var(--tile-hi); background: var(--ink); border-radius: 14px; padding: 10px 12px; cursor: pointer; min-width: 0; }
+.sp[aria-pressed="true"] { border-color: var(--lemon); background: var(--tile-hi); }
+.sp:disabled { opacity: .4; cursor: default; }
+.sp .se { font-size: 1.7rem; line-height: 1.2; }
+.sp .sn { font-weight: 500; }
+.sp .sd { font-size: .75rem; line-height: 1.45; color: var(--muted); }
+.sp .sm { font-size: .75rem; color: var(--coral); }
+.rolebox { width: 100%; display: flex; gap: 12px; align-items: flex-start; text-align: start; background: var(--tile); border: 2px solid var(--lemon); border-radius: 16px; padding: 12px 16px; }
+.rolebox .re, .mime .re { font-size: 2.2rem; line-height: 1.1; flex: none; }
+.rolebox h3 { font-size: 1.35rem; color: var(--lemon); }
+.rolebox p + p { margin-top: 4px; }
+.mime { display: flex; gap: 12px; text-align: start; background: var(--tile); border: 2px dashed var(--lilac); border-radius: 14px; padding: 12px 14px; }
+.mime h3 { font-size: 1.2rem; color: var(--lilac); }
+
+/* pills */
+.pills { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.pill { display: inline-flex; gap: 6px; align-items: baseline; padding: 4px 14px; border-radius: 999px; border: 1.5px solid currentColor; font-size: .875rem; }
+.pill b { font-family: var(--f-display); font-weight: 400; font-size: 1.15rem; }
+.c { color: var(--mint); }
+.i { color: var(--coral); }
+.g { color: var(--lilac); }
+
+/* buttons */
+.btn { display: block; width: 100%; min-height: 52px; border-radius: 14px; border: 2px solid var(--tile-hi); background: none; padding: 10px 18px; cursor: pointer; font-weight: 500; }
+.btn.primary { background: var(--lemon); border-color: var(--lemon); color: var(--on-lemon); font-size: 1.05rem; }
+.btn.danger { background: var(--coral); border-color: var(--coral); color: var(--on-lemon); }
+.btn:disabled { opacity: .4; cursor: default; }
+.link { background: none; border: 0; color: var(--muted); text-decoration: underline; cursor: pointer; padding: 8px; align-self: center; }
+.btn-pair { display: flex; gap: 10px; }
+.btn-pair .btn { flex: 1; }
+
+/* stage screens */
+.stage { display: flex; flex-direction: column; gap: 16px; align-items: stretch; text-align: center; }
+.eyebrow { font-size: .8125rem; letter-spacing: .06em; color: var(--muted); }
+.lead { color: var(--muted); }
+.bigname { font-size: 2.6rem; line-height: 1.15; overflow-wrap: anywhere; }
+.midname { font-size: 1.6rem; line-height: 1.25; }
+.muted { color: var(--muted); }
+.msg { background: var(--tile); border-radius: 14px; padding: 12px 14px; text-align: start; }
+
+/* card */
+.card { perspective: 900px; width: 100%; aspect-ratio: 4 / 3; max-width: 100%; background: none; border: 0; padding: 0; cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+.card-inner { position: relative; display: block; width: 100%; height: 100%; transition: transform .6s; transform-style: preserve-3d; }
+.card.open .card-inner { transform: rotateY(180deg); }
+.face { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; border-radius: 22px; padding: 16px; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.front { background-color: var(--tile); background-image: var(--lattice-hi); border: 2px solid var(--tile-hi); color: var(--text); }
+.back { transform: rotateY(180deg); background: var(--lemon); color: var(--on-lemon); }
+.back small { font-size: .875rem; opacity: .75; }
+.word { font-size: clamp(2rem, 10vw, 3.4rem); line-height: 1.15; overflow-wrap: anywhere; }
+.word.blank { opacity: .85; }
+.back em { font-style: normal; font-size: .875rem; }
+
+/* translate */
+.after { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+.tr-btn { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 6px 18px; border-radius: 999px; border: 2px solid var(--lemon); background: none; color: var(--lemon); cursor: pointer; font-weight: 500; }
+.tr-btn[aria-expanded="true"] { background: var(--lemon); color: var(--on-lemon); }
+.ti { display: inline-flex; align-items: center; gap: 2px; direction: ltr; }
+.ti b, .ti i { width: 24px; height: 24px; display: grid; place-items: center; border: 1.5px solid currentColor; border-radius: 6px; font-size: .8125rem; font-style: normal; font-weight: 600; line-height: 1; }
+.ti i { margin-inline-start: -4px; background: var(--tile); color: var(--text); border-color: var(--tile); }
+.tr-btn[aria-expanded="true"] .ti i { background: var(--on-lemon); color: var(--lemon); border-color: var(--on-lemon); }
+.tr-panel { width: 100%; background: var(--tile); border-radius: 16px; padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+.tr-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.tl { font-size: .8125rem; color: var(--muted); flex: none; }
+.tw { font-size: 1.35rem; font-weight: 500; overflow-wrap: anywhere; text-align: end; }
+.alt { display: block; font-size: .875rem; color: var(--muted); font-weight: 400; }
+
+/* discussion */
+.order { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; text-align: start; counter-reset: turn; }
+.order li { counter-increment: turn; display: flex; align-items: center; gap: 12px; background: var(--tile); border-radius: 12px; padding: 10px 14px; }
+.order li::before { content: counter(turn); width: 28px; height: 28px; border-radius: 50%; background: var(--tile-hi); display: grid; place-items: center; font-size: .8125rem; flex: none; }
+.order li.first { background: var(--lemon); color: var(--on-lemon); font-weight: 600; }
+.order li.first::before { background: var(--on-lemon); color: var(--lemon); }
+.timer { display: flex; align-items: center; gap: 10px; background: var(--tile); border-radius: 14px; padding: 10px 14px; }
+.timer output { font-size: 1.9rem; flex: 1; text-align: start; font-variant-numeric: tabular-nums; }
+.timer output.done { color: var(--coral); }
+.timer button { border: 0; border-radius: 10px; background: var(--tile-hi); padding: 10px 14px; cursor: pointer; }
+
+/* voting + tally */
+.votes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.vote { min-height: 64px; border-radius: 14px; border: 2px solid var(--tile-hi); background: var(--tile); padding: 8px 10px; cursor: pointer; overflow-wrap: anywhere; font-weight: 500; }
+.vote[aria-pressed="true"] { background: var(--coral); border-color: var(--coral); color: var(--on-lemon); }
+.tally { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; text-align: start; }
+.tally li { display: flex; align-items: center; gap: 12px; background: var(--tile); border-radius: 12px; padding: 10px 14px; }
+.tally li.top { outline: 2px solid var(--coral); }
+.tally .who { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.tally .who small { display: block; color: var(--muted); }
+.tally .n { font-family: var(--f-display); font-size: 1.8rem; min-width: 2ch; text-align: center; }
+
+/* verdict & end */
+.verdict { display: flex; flex-direction: column; align-items: center; gap: 0; border: 2px solid currentColor; border-radius: 20px; padding: 14px; }
+.verdict span { color: var(--muted); font-size: .875rem; }
+.verdict strong { font-size: 3rem; line-height: 1.2; }
+.guess { display: flex; flex-direction: column; gap: 10px; background: var(--tile); border-radius: 16px; padding: 16px; text-align: start; }
+.guess input { background: var(--ink); border: 0; border-radius: 12px; padding: 14px; }
+.winner { font-size: 2.8rem; line-height: 1.15; }
+.words { display: flex; flex-direction: column; gap: 8px; align-items: stretch; }
+.words span { background: var(--tile); border-radius: 12px; padding: 8px 14px; }
+.words b { font-weight: 600; }
+.roster { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; text-align: start; }
+.roster li { display: flex; align-items: center; gap: 10px; background: var(--tile); border-radius: 12px; padding: 10px 14px; }
+.roster .who { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.roster .who small { display: block; color: var(--muted); }
+.roster .tag { font-weight: 600; font-size: .875rem; }
+.roster .pt { display: flex; flex-direction: column; align-items: flex-end; min-width: 4.2rem; }
+.roster .pt b { font-family: var(--f-display); font-weight: 400; font-size: 1.5rem; line-height: 1.1; }
+.roster .pt small { font-size: .75rem; color: var(--muted); }
+.roster li.out .who { opacity: .55; }
+.confirm { background: var(--tile); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; text-align: center; }
+
+.credit { display: flex; align-items: center; justify-content: center; gap: 8px; padding-top: 8px; color: var(--muted); font-size: .875rem; letter-spacing: .04em; direction: ltr; }
+.credit svg { color: var(--lemon); }
+
+@media (prefers-reduced-motion: reduce) {
+  .card-inner, .switch::after { transition: none; }
+}
+</style>
+
+<div id="app"></div>
+
+<script>
+(function () {
+  'use strict';
+  var app = document.getElementById('app');
+
+  var I18N = {
+    en: {
+      tagline: 'Two similar words. One of you holds the other.', how: 'How to play',
+      rules: [
+        ['Words', 'Each player secretly gets a word. Citizens share the same word, intruders get a close one, and ghosts get none.'],
+        ['Discussion', 'In turn, each player describes their word in a short phrase without saying it.'],
+        ['Voting', 'Everyone votes in secret on the same phone. The player with the most votes is eliminated and their role is revealed.'],
+        ['Winning', 'Citizens win when every intruder and ghost is out. Intruders win when they equal or outnumber the citizens. An eliminated ghost gets one chance to guess the citizens\' word.'],
+        ['Special roles', 'Optional roles add twists: extra powers, secret pairs and bonus points. Pick them in the setup.'],
+        ['Points', 'Every player on the winning side scores 3 points. Some roles add or remove points. Scores carry over when you replay with the same players.']
+      ],
+      settings: 'Settings', settingsClose: 'Close', language: 'Language', sfx: 'Sound effects', music: 'Background music', volume: 'Volume',
+      players: 'Players', playerN: 'Player {n}', roles: 'Roles', intruderCount: 'Number of intruders',
+      ghostCount: 'Number of ghosts', ghostSub: 'Players with no word who try to blend in',
+      specH: 'Special roles', specHint: 'Tap a role to add it to the game. Some roles need a minimum number of players. If you pick more roles than there are seats, a random selection is dealt.', minP: '{n}+ players',
+      wordsH: 'Words', topics: 'Topics', all: 'Select all', none: 'Clear', pairsSel: '{n} word pairs in play',
+      wordLang: 'Words language', custom: 'Your own words', customPh: 'One pair per line, for example:\nCoca-Cola - Pepsi',
+      validPairs: '{n} valid pairs', onlyMine: 'Play with my words only', deal: 'Deal the words',
+      errPick: 'Pick at least one topic or add your own words.',
+      pCitizens: 'Citizens', pIntruders: 'Intruders', pGhost: 'Ghosts',
+      rCitizen: 'Citizen', rIntruder: 'Intruder', rGhost: 'Ghost',
+      playerOf: 'Player {a} of {b}', handTo: 'Hand the phone to', tapCard: 'Tap the card to reveal your word',
+      yourWord: 'Your word', yourCard: 'Your card', noWord: 'No word', blend: 'Blend in and work out their word',
+      translate: 'Translate', hidePass: 'Hide the word and pass to {name}', startDisc: 'Start the discussion',
+      revealedLbl: 'Card revealed', revealLbl: 'Reveal your card',
+      yourSpecial: 'Your special role', partnerLover: 'Your lover:', partnerDuel: 'Your duel opponent:', sellerAbility: 'Your random ability this game:',
+      round: 'Round {n}', starts: '{name} starts', discHint: 'Each player describes their word in a short phrase, without saying it, in this order.',
+      mimeTitle: 'Mr. Meme\'s challenge', mimeText: '{name} must describe their word with gestures only. No talking.',
+      tStart: 'Start timer', tPause: 'Pause', tResume: 'Resume', tReset: 'Reset', timeUp: 'Time is up', toVote: 'Go to voting',
+      quit: 'End game and return to setup', quitQ: 'This round will be lost. Leave the game?', quitYes: 'Yes, end it', quitNo: 'Keep playing',
+      voteOf: 'Secret ballot {a} of {b}', whoVote: 'Who do you vote for?', confirmVote: 'Confirm vote', pickOne: 'Pick a player',
+      shadowNote: 'You were eliminated, but as the Shadow your vote still counts.', backDisc: 'Back to the discussion',
+      results: 'Votes', rebound: 'Rebound', mostVotes: 'Most votes: {name}.',
+      tieQueen: 'Tie! {queen} is the Queen of Justice and decides between {list}.', tieNone: 'Tie! Nobody is eliminated this round.',
+      boomMsg: '{name} was the Boomerang! The votes bounce back onto the players who cast them.',
+      boomNone: 'Nobody who voted for the Boomerang can be hit by the rebound, so nobody is eliminated.',
+      boomHit: 'The rebound hits {name}.', boomRandom: 'Tie on the rebound. Chance picks {name}.', boomQueen: 'Tie on the rebound. {queen} decides who takes the hit.',
+      queenH: 'Queen of Justice', queenPick: 'Choose who is eliminated.', elimBtn: 'Eliminate {name}', cont: 'Continue',
+      elimTitle: 'Eliminated', was: 'was', theirWord: 'Their word:', noWordHad: 'They had no word.',
+      causeVote: 'Eliminated by the vote.', causeLove: 'Follows their lover, {name}.', causeRevenge: 'Taken down by {name}\'s revenge.', causeBoom: 'Hit by the Boomerang\'s rebound.',
+      avengerQ: 'You may take someone down with you.', avengerSkip: 'Spare everyone', specialRole: 'Special role',
+      ghostQ: 'Ghost, you get one last chance. What is the citizens\' word?', guess: 'Guess', wrongGuess: 'Wrong guess. Keep playing.',
+      over: 'Game over', cWin: 'Citizens win', cWinSub: 'They found everyone hiding among them.',
+      iWin: 'Intruders win', iWinSub: 'They stayed hidden to the end.', iWinSubG: 'They stayed hidden to the end, with the ghosts beside them.',
+      gWin: 'The ghosts win', gWinSubG: 'They guessed the citizens\' word.', gWinSubH: 'They stayed hidden to the end.',
+      cWord: 'Citizens\' word', iWord: 'Intruders\' word', scores: 'Scores', totalLbl: 'Total {n}',
+      again: 'New round, same players', settingsBtn: 'Edit settings'
+    },
+    ar: {
+      tagline: 'كلمتان متشابهتان، وبينكم من يحمل الأخرى.', how: 'كيف تُلعب؟',
+      rules: [
+        ['الكلمات', 'يحصل كل لاعب سرًّا على كلمة. المواطنون كلمتهم واحدة، والدخلاء كلمتهم قريبة منها، والأشباح بلا كلمة.'],
+        ['النقاش', 'بالدور، يصف كل لاعب كلمته بعبارة قصيرة دون أن يذكرها.'],
+        ['التصويت', 'يصوّت الجميع سرًّا على نفس الهاتف. من ينال أكثر الأصوات يُقصى وتظهر هويته.'],
+        ['الفوز', 'يفوز المواطنون إذا خرج الدخلاء والأشباح. يفوز الدخلاء إذا صار عددهم مساويًا للمواطنين أو أكبر. وإذا خرج شبح فله فرصة أخيرة لتخمين كلمة المواطنين.'],
+        ['الأدوار الخاصة', 'أدوار اختيارية تضيف مفاجآت: قوى إضافية وثنائيات سرية ونقاط إضافية. اخترها من شاشة الإعداد.'],
+        ['النقاط', 'كل لاعب في الفريق الفائز يربح 3 نقاط. وبعض الأدوار تضيف نقاطًا أو تخصمها. تتراكم النقاط عند إعادة اللعب بنفس اللاعبين.']
+      ],
+      settings: 'الإعدادات', settingsClose: 'إغلاق', language: 'اللغة', sfx: 'المؤثرات الصوتية', music: 'موسيقى الخلفية', volume: 'مستوى الصوت',
+      players: 'اللاعبون', playerN: 'لاعب {n}', roles: 'الأدوار', intruderCount: 'عدد الدخلاء',
+      ghostCount: 'عدد الأشباح', ghostSub: 'لاعبون بلا كلمة يحاولون الاندماج',
+      specH: 'الأدوار الخاصة', specHint: 'المس دورًا لإضافته إلى اللعبة. بعض الأدوار تحتاج حدًّا أدنى من اللاعبين. وإذا اخترت أدوارًا أكثر من عدد اللاعبين يُوزَّع بعضها عشوائيًا.', minP: '{n}+ لاعبين',
+      wordsH: 'الكلمات', topics: 'المواضيع', all: 'اختيار الكل', none: 'مسح', pairsSel: '{n} زوج كلمات في اللعبة',
+      wordLang: 'لغة الكلمات', custom: 'كلماتك الخاصة', customPh: 'سطر لكل زوج، مثل:\nكوكاكولا - بيبسي',
+      validPairs: '{n} زوج صالح', onlyMine: 'العب بكلماتي فقط', deal: 'وزّع الكلمات',
+      errPick: 'اختر موضوعًا واحدًا على الأقل أو أضف كلماتك.',
+      pCitizens: 'مواطنون', pIntruders: 'دخلاء', pGhost: 'أشباح',
+      rCitizen: 'مواطن', rIntruder: 'دخيل', rGhost: 'شبح',
+      playerOf: 'اللاعب {a} من {b}', handTo: 'أعطِ الجهاز إلى', tapCard: 'المس البطاقة لتكشف كلمتك',
+      yourWord: 'كلمتك', yourCard: 'بطاقتك', noWord: 'بلا كلمة', blend: 'اندمج واستنتج كلمتهم',
+      translate: 'ترجمة', hidePass: 'خبّئ الكلمة ومرّر إلى {name}', startDisc: 'ابدؤوا النقاش',
+      revealedLbl: 'البطاقة مكشوفة', revealLbl: 'اكشف بطاقتك',
+      yourSpecial: 'دورك الخاص', partnerLover: 'حبيبك:', partnerDuel: 'خصمك في المبارزة:', sellerAbility: 'قدرتك العشوائية في هذه اللعبة:',
+      round: 'الجولة {n}', starts: 'يبدأ {name}', discHint: 'كل لاعب يصف كلمته بعبارة قصيرة دون أن يقولها، بالترتيب التالي.',
+      mimeTitle: 'تحدّي الممثل الصامت', mimeText: 'على {name} أن يصف كلمته بالإيماءات فقط، دون كلام.',
+      tStart: 'ابدأ المؤقت', tPause: 'إيقاف مؤقت', tResume: 'متابعة', tReset: 'إعادة', timeUp: 'انتهى الوقت', toVote: 'انتقلوا إلى التصويت',
+      quit: 'إنهاء اللعبة والعودة للإعداد', quitQ: 'سيضيع تقدّم هذه الجولة. هل تريد الخروج؟', quitYes: 'نعم، أنهِ', quitNo: 'متابعة اللعب',
+      voteOf: 'الصوت السري {a} من {b}', whoVote: 'لمن تصوّت؟', confirmVote: 'تأكيد التصويت', pickOne: 'اختر لاعبًا',
+      shadowNote: 'لقد أُقصيت، لكن بصفتك الظل يبقى صوتك محسوبًا.', backDisc: 'العودة إلى النقاش',
+      results: 'الأصوات', rebound: 'الأصوات المرتدّة', mostVotes: 'أكثر الأصوات: {name}.',
+      tieQueen: 'تعادل! {queen} هي ملكة العدالة وتحسم بين {list}.', tieNone: 'تعادل! لا أحد يُقصى في هذه الجولة.',
+      boomMsg: '{name} كان البومرانغ! ترتدّ الأصوات على من صوّتوا ضده.',
+      boomNone: 'لا أحد ممن صوّتوا ضد البومرانغ يمكن أن تصيبه الأصوات المرتدّة، لذا لا أحد يُقصى.',
+      boomHit: 'الأصوات المرتدّة تصيب {name}.', boomRandom: 'تعادل في الأصوات المرتدّة. اختارت الصدفة {name}.', boomQueen: 'تعادل في الأصوات المرتدّة. تقرر {queen} من يتلقى الضربة.',
+      queenH: 'ملكة العدالة', queenPick: 'اختر من يُقصى.', elimBtn: 'أقصِ {name}', cont: 'متابعة',
+      elimTitle: 'تم الإقصاء', was: 'كان', theirWord: 'كلمته:', noWordHad: 'لم تكن معه كلمة.',
+      causeVote: 'أُقصي بالتصويت.', causeLove: 'يلحق بحبيبه {name}.', causeRevenge: 'أطاح به انتقام {name}.', causeBoom: 'أصابته الأصوات المرتدّة من البومرانغ.',
+      avengerQ: 'يمكنك أن تُقصي معك لاعبًا.', avengerSkip: 'أعفِ الجميع', specialRole: 'الدور الخاص',
+      ghostQ: 'أيها الشبح، لديك فرصة واحدة. ما كلمة المواطنين؟', guess: 'خمّن', wrongGuess: 'التخمين خاطئ. تابعوا اللعب.',
+      over: 'انتهت اللعبة', cWin: 'فاز المواطنون', cWinSub: 'كشفوا كل من اندسّ بينهم.',
+      iWin: 'فاز الدخلاء', iWinSub: 'بقوا بينكم إلى النهاية.', iWinSubG: 'بقوا إلى النهاية، ومعهم الأشباح.',
+      gWin: 'فاز الأشباح', gWinSubG: 'خمّنوا كلمة المواطنين.', gWinSubH: 'بقوا بينكم دون أن يُكشفوا.',
+      cWord: 'كلمة المواطنين', iWord: 'كلمة الدخلاء', scores: 'النقاط', totalLbl: 'المجموع {n}',
+      again: 'جولة جديدة بنفس اللاعبين', settingsBtn: 'تعديل الإعدادات'
+    },
+    fr: {
+      tagline: 'Deux mots proches. L\'un de vous détient l\'autre.', how: 'Comment jouer ?',
+      rules: [
+        ['Les mots', 'Chaque joueur reçoit un mot en secret. Les citoyens ont le même mot, les intrus un mot proche, et les fantômes n\'en ont pas.'],
+        ['Discussion', 'À tour de rôle, chacun décrit son mot en une courte phrase sans le dire.'],
+        ['Vote', 'Tout le monde vote en secret sur le même téléphone. Le joueur qui a le plus de votes est éliminé et son rôle est révélé.'],
+        ['Victoire', 'Les citoyens gagnent quand tous les intrus et fantômes sont éliminés. Les intrus gagnent quand ils sont aussi nombreux que les citoyens ou plus. Un fantôme éliminé a une dernière chance de deviner le mot des citoyens.'],
+        ['Rôles spéciaux', 'Des rôles optionnels ajoutent des surprises : pouvoirs, duos secrets et points bonus. Choisissez-les dans les réglages de la partie.'],
+        ['Points', 'Chaque joueur du camp gagnant marque 3 points. Certains rôles ajoutent ou retirent des points. Les scores se cumulent quand vous rejouez avec les mêmes joueurs.']
+      ],
+      settings: 'Réglages', settingsClose: 'Fermer', language: 'Langue', sfx: 'Effets sonores', music: 'Musique de fond', volume: 'Volume',
+      players: 'Joueurs', playerN: 'Joueur {n}', roles: 'Rôles', intruderCount: 'Nombre d\'intrus',
+      ghostCount: 'Nombre de fantômes', ghostSub: 'Des joueurs sans mot qui tentent de se fondre dans le groupe',
+      specH: 'Rôles spéciaux', specHint: 'Touchez un rôle pour l\'ajouter à la partie. Certains rôles demandent un nombre minimum de joueurs. S\'il y a plus de rôles que de places, un tirage au sort est fait.', minP: '{n}+ joueurs',
+      wordsH: 'Mots', topics: 'Thèmes', all: 'Tout sélectionner', none: 'Effacer', pairsSel: '{n} paires de mots en jeu',
+      wordLang: 'Langue des mots', custom: 'Vos propres mots', customPh: 'Une paire par ligne, par exemple :\nCoca-Cola - Pepsi',
+      validPairs: '{n} paires valides', onlyMine: 'Jouer uniquement avec mes mots', deal: 'Distribuer les mots',
+      errPick: 'Choisissez au moins un thème ou ajoutez vos mots.',
+      pCitizens: 'Citoyens', pIntruders: 'Intrus', pGhost: 'Fantômes',
+      rCitizen: 'Citoyen', rIntruder: 'Intrus', rGhost: 'Fantôme',
+      playerOf: 'Joueur {a} sur {b}', handTo: 'Passez le téléphone à', tapCard: 'Touchez la carte pour voir votre mot',
+      yourWord: 'Votre mot', yourCard: 'Votre carte', noWord: 'Aucun mot', blend: 'Fondez-vous dans le groupe et devinez leur mot',
+      translate: 'Traduire', hidePass: 'Cachez le mot et passez à {name}', startDisc: 'Lancer la discussion',
+      revealedLbl: 'Carte révélée', revealLbl: 'Révéler votre carte',
+      yourSpecial: 'Votre rôle spécial', partnerLover: 'Votre amoureux(se) :', partnerDuel: 'Votre adversaire de duel :', sellerAbility: 'Votre capacité aléatoire pour cette partie :',
+      round: 'Tour {n}', starts: '{name} commence', discHint: 'Chacun décrit son mot en une courte phrase, sans le dire, dans cet ordre.',
+      mimeTitle: 'Défi de Mr. Meme', mimeText: '{name} doit décrire son mot avec des gestes uniquement, sans parler.',
+      tStart: 'Lancer le minuteur', tPause: 'Pause', tResume: 'Reprendre', tReset: 'Réinitialiser', timeUp: 'Temps écoulé', toVote: 'Passer au vote',
+      quit: 'Terminer la partie et revenir aux réglages', quitQ: 'La partie en cours sera perdue. Quitter ?', quitYes: 'Oui, terminer', quitNo: 'Continuer à jouer',
+      voteOf: 'Vote secret {a} sur {b}', whoVote: 'Pour qui votez-vous ?', confirmVote: 'Confirmer le vote', pickOne: 'Choisissez un joueur',
+      shadowNote: 'Vous avez été éliminé, mais en tant qu\'Ombre votre vote compte toujours.', backDisc: 'Retour à la discussion',
+      results: 'Votes', rebound: 'Rebond', mostVotes: 'Le plus de votes : {name}.',
+      tieQueen: 'Égalité ! {queen} est la Reine de la Justice et départage {list}.', tieNone: 'Égalité ! Personne n\'est éliminé ce tour-ci.',
+      boomMsg: '{name} était le Boomerang ! Les votes rebondissent sur ceux qui les ont exprimés.',
+      boomNone: 'Aucun votant ne peut être touché par le rebond, donc personne n\'est éliminé.',
+      boomHit: 'Le rebond touche {name}.', boomRandom: 'Égalité sur le rebond. Le hasard désigne {name}.', boomQueen: 'Égalité sur le rebond. {queen} décide qui encaisse.',
+      queenH: 'Reine de la Justice', queenPick: 'Choisissez qui est éliminé.', elimBtn: 'Éliminer {name}', cont: 'Continuer',
+      elimTitle: 'Éliminé', was: 'était', theirWord: 'Son mot :', noWordHad: 'Il n\'avait pas de mot.',
+      causeVote: 'Éliminé par le vote.', causeLove: 'Suit son amoureux(se), {name}.', causeRevenge: 'Emporté par la vengeance de {name}.', causeBoom: 'Touché par le rebond du Boomerang.',
+      avengerQ: 'Vous pouvez emporter quelqu\'un avec vous.', avengerSkip: 'Épargner tout le monde', specialRole: 'Rôle spécial',
+      ghostQ: 'Fantôme, vous avez une dernière chance. Quel est le mot des citoyens ?', guess: 'Deviner', wrongGuess: 'Mauvaise réponse. Continuez à jouer.',
+      over: 'Partie terminée', cWin: 'Les citoyens gagnent', cWinSub: 'Ils ont démasqué tous ceux qui se cachaient parmi eux.',
+      iWin: 'Les intrus gagnent', iWinSub: 'Ils sont restés cachés jusqu\'au bout.', iWinSubG: 'Ils sont restés cachés jusqu\'au bout, avec les fantômes.',
+      gWin: 'Les fantômes gagnent', gWinSubG: 'Ils ont deviné le mot des citoyens.', gWinSubH: 'Ils sont restés cachés jusqu\'au bout.',
+      cWord: 'Mot des citoyens', iWord: 'Mot des intrus', scores: 'Scores', totalLbl: 'Total {n}',
+      again: 'Nouveau tour, mêmes joueurs', settingsBtn: 'Modifier les réglages'
+    }
+  };
+  var LN = { en: 'English', ar: 'العربية', fr: 'Français' };
+
+  /* ---------- special roles ---------- */
+  var SP = {
+    joy: { e: '🤪', min: 3, slots: 1, solo: true,
+      n: { en: 'The Joyful Fool', ar: 'مجنون الفرح', fr: 'Le Fou de Joie' },
+      d: { en: 'Scores 4 bonus points if he is the first player eliminated.', ar: 'يربح 4 نقاط إضافية إذا كان أول لاعب يُقصى.', fr: 'Gagne 4 points supplémentaires s\'il est éliminé en premier.' } },
+    boom: { e: '🪃', min: 3, slots: 1, solo: true,
+      n: { en: 'The Boomerang', ar: 'البومرانغ', fr: 'Le Boomerang' },
+      d: { en: 'The first time he gets the most votes, he is not eliminated: the votes bounce back onto the players who cast them.', ar: 'في أول مرة ينال فيها أكثر الأصوات لا يُقصى، وترتدّ الأصوات على من صوّتوا ضده.', fr: 'La première fois qu\'il reçoit le plus de votes, il n\'est pas éliminé : les votes rebondissent sur ceux qui les ont exprimés.' } },
+    queen: { e: '👑', min: 3, slots: 1, solo: true,
+      n: { en: 'Queen of Justice', ar: 'ملكة العدالة', fr: 'La Reine de la Justice' },
+      d: { en: 'In a tied vote she decides who is eliminated, even if she is already out.', ar: 'عند تعادل الأصوات تقرر من يُقصى، حتى لو كانت قد أُقصيت.', fr: 'En cas d\'égalité des votes, elle décide qui est éliminé, même si elle l\'est déjà.' } },
+    shadow: { e: '👤', min: 3, slots: 1, solo: true,
+      n: { en: 'The Shadow', ar: 'الظل', fr: 'L\'Ombre' },
+      d: { en: 'Can still vote after being eliminated.', ar: 'يستطيع التصويت حتى بعد إقصائه.', fr: 'Peut encore voter après avoir été éliminé.' } },
+    lover: { e: '💞', min: 5, slots: 2, solo: false,
+      n: { en: 'The Lovers', ar: 'العاشقان', fr: 'Les Amoureux' },
+      d: { en: 'If one of them is eliminated, the other goes down too.', ar: 'إذا أُقصي أحدهما أُقصي الآخر معه.', fr: 'Si l\'un d\'eux est éliminé, l\'autre l\'est aussi.' } },
+    meme: { e: '🎭', min: 3, slots: 1, solo: true,
+      n: { en: 'Mr. Meme', ar: 'الممثل الصامت', fr: 'Mr. Meme' },
+      d: { en: 'Each round, one player must describe their word with gestures instead of speaking (in person or on video).', ar: 'في كل جولة يجب على لاعب أن يصف كلمته بالإيماءات بدل الكلام (حضوريًا أو بالفيديو).', fr: 'À chaque tour, un joueur doit décrire son mot avec des gestes au lieu de parler (en présentiel ou en vidéo).' } },
+    seller: { e: '🧆', min: 4, slots: 1, solo: false,
+      n: { en: 'The Falafel Seller', ar: 'بائع الفلافل', fr: 'Le Vendeur de Falafels' },
+      d: { en: 'Gets a random ability every game. Try your luck!', ar: 'يحصل على قدرة عشوائية في كل لعبة. جرّب حظّك!', fr: 'Reçoit une capacité aléatoire à chaque partie. Tentez votre chance !' } },
+    avenger: { e: '🗡️', min: 5, slots: 1, solo: true,
+      n: { en: 'The Avenger', ar: 'المنتقمة', fr: 'La Vengeuse' },
+      d: { en: 'When she is eliminated, she can take someone down with her.', ar: 'عندما تُقصى تستطيع أن تُقصي معها لاعبًا.', fr: 'Quand elle est éliminée, elle peut éliminer quelqu\'un avec elle.' } },
+    duel: { e: '⚔️', min: 5, slots: 2, solo: false,
+      n: { en: 'The Duelists', ar: 'المتبارزان', fr: 'Les Duellistes' },
+      d: { en: 'Two players are locked in a secret duel. The first one eliminated loses 2 points and the other gains 2.', ar: 'لاعبان في مبارزة سرية. أول من يُقصى منهما يخسر نقطتين والآخر يربح نقطتين.', fr: 'Deux joueurs sont engagés dans un duel secret. Le premier éliminé perd 2 points, l\'autre en gagne 2.' } }
+  };
+  var SPK = ['joy', 'boom', 'queen', 'shadow', 'lover', 'meme', 'seller', 'avenger', 'duel'];
+
+  /* ---------- word bank: "English|العربية|Français" ---------- */
+  var RAW = [
+    { id: 'food', tn: false, label: { en: 'Food & Drink', ar: 'طعام وشراب', fr: 'Nourriture' }, pairs: [
+      ["Tea|شاي|Thé", "Coffee|قهوة|Café"], ["Pizza|بيتزا|Pizza", "Pie|فطيرة|Tourte"], ["Honey|عسل|Miel", "Jam|مربى|Confiture"],
+      ["Chicken|دجاج|Poulet", "Turkey|ديك رومي|Dinde"], ["Chickpeas|حمص|Pois chiches", "Fava beans|فول|Fèves"],
+      ["Bread|خبز|Pain", "Croissant|كرواسان|Croissant"], ["Salad|سلطة|Salade", "Soup|شوربة|Soupe"],
+      ["Orange|برتقال|Orange", "Lemon|ليمون|Citron"], ["Chips|رقائق البطاطا|Chips", "Popcorn|فشار|Pop-corn"],
+      ["Chocolate|شوكولاتة|Chocolat", "Caramel|كراميل|Caramel"], ["Ice cream|بوظة|Glace", "Milkshake|ميلك شيك|Milkshake"],
+      ["Rice|أرز|Riz", "Pasta|معكرونة|Pâtes"], ["Apple|تفاح|Pomme", "Pear|إجاص|Poire"],
+      ["Strawberry|فراولة|Fraise", "Cherry|كرز|Cerise"], ["Burger|برغر|Burger", "Hot dog|هوت دوغ|Hot-dog"],
+      ["Water|ماء|Eau", "Juice|عصير|Jus"], ["Butter|زبدة|Beurre", "Cheese|جبن|Fromage"], ["Cake|كعكة|Gâteau", "Cookie|بسكويت|Biscuit"]
+    ] },
+    { id: 'places', tn: false, label: { en: 'Places', ar: 'أماكن', fr: 'Lieux' }, pairs: [
+      ["Beach|شاطئ|Plage", "Swimming pool|مسبح|Piscine"], ["School|مدرسة|École", "University|جامعة|Université"],
+      ["Hospital|مستشفى|Hôpital", "Clinic|عيادة|Clinique"], ["Airport|مطار|Aéroport", "Train station|محطة قطار|Gare"],
+      ["Market|سوق|Marché", "Supermarket|سوبرماركت|Supermarché"], ["Library|مكتبة|Bibliothèque", "Museum|متحف|Musée"],
+      ["Stadium|ملعب|Stade", "Gym|قاعة رياضة|Salle de sport"], ["Hotel|فندق|Hôtel", "Hostel|نزل|Auberge"],
+      ["Desert|صحراء|Désert", "Oasis|واحة|Oasis"], ["Castle|قلعة|Château", "Palace|قصر|Palais"],
+      ["Park|حديقة|Parc", "Forest|غابة|Forêt"], ["Café|مقهى|Café", "Restaurant|مطعم|Restaurant"],
+      ["Cinema|سينما|Cinéma", "Theatre|مسرح|Théâtre"], ["Bakery|مخبزة|Boulangerie", "Pastry shop|محل حلويات|Pâtisserie"],
+      ["Island|جزيرة|Île", "Peninsula|شبه جزيرة|Presqu'île"], ["Bank|بنك|Banque", "Post office|مكتب بريد|Bureau de poste"]
+    ] },
+    { id: 'animals', tn: false, label: { en: 'Animals', ar: 'حيوانات', fr: 'Animaux' }, pairs: [
+      ["Cat|قطة|Chat", "Lion|أسد|Lion"], ["Horse|حصان|Cheval", "Donkey|حمار|Âne"], ["Eagle|نسر|Aigle", "Falcon|صقر|Faucon"],
+      ["Dolphin|دلفين|Dauphin", "Whale|حوت|Baleine"], ["Wolf|ذئب|Loup", "Dog|كلب|Chien"],
+      ["Butterfly|فراشة|Papillon", "Bee|نحلة|Abeille"], ["Crocodile|تمساح|Crocodile", "Lizard|سحلية|Lézard"],
+      ["Camel|جمل|Chameau", "Giraffe|زرافة|Girafe"], ["Duck|بطة|Canard", "Goose|إوزة|Oie"],
+      ["Mouse|فأر|Souris", "Hamster|هامستر|Hamster"], ["Rabbit|أرنب|Lapin", "Squirrel|سنجاب|Écureuil"],
+      ["Shark|قرش|Requin", "Octopus|أخطبوط|Pieuvre"], ["Cow|بقرة|Vache", "Sheep|خروف|Mouton"],
+      ["Fox|ثعلب|Renard", "Jackal|ابن آوى|Chacal"], ["Snake|ثعبان|Serpent", "Scorpion|عقرب|Scorpion"],
+      ["Parrot|ببغاء|Perroquet", "Owl|بومة|Hibou"]
+    ] },
+    { id: 'objects', tn: false, label: { en: 'Everyday Objects', ar: 'أشياء', fr: 'Objets' }, pairs: [
+      ["Wristwatch|ساعة يد|Montre", "Alarm clock|منبّه|Réveil"], ["Phone|هاتف|Téléphone", "Tablet|لوح إلكتروني|Tablette"],
+      ["Chair|كرسي|Chaise", "Sofa|أريكة|Canapé"], ["Pencil|قلم رصاص|Crayon", "Pen|قلم حبر|Stylo"],
+      ["Glasses|نظارة|Lunettes", "Contact lenses|عدسات لاصقة|Lentilles"], ["Umbrella|مظلة|Parapluie", "Raincoat|معطف مطر|Imperméable"],
+      ["Key|مفتاح|Clé", "Padlock|قفل|Cadenas"], ["Mirror|مرآة|Miroir", "Window|نافذة|Fenêtre"],
+      ["Backpack|حقيبة ظهر|Sac à dos", "Wallet|محفظة|Portefeuille"], ["Pillow|وسادة|Oreiller", "Blanket|بطانية|Couverture"],
+      ["Candle|شمعة|Bougie", "Lamp|مصباح|Lampe"], ["Spoon|ملعقة|Cuillère", "Fork|شوكة|Fourchette"],
+      ["Plate|صحن|Assiette", "Bowl|وعاء|Bol"], ["Scissors|مقص|Ciseaux", "Knife|سكين|Couteau"],
+      ["Towel|منشفة|Serviette", "Soap|صابون|Savon"], ["Brush|فرشاة|Brosse", "Comb|مشط|Peigne"]
+    ] },
+    { id: 'jobs', tn: false, label: { en: 'Jobs', ar: 'مهن', fr: 'Métiers' }, pairs: [
+      ["Doctor|طبيب|Médecin", "Nurse|ممرض|Infirmier"], ["Teacher|معلم|Enseignant", "Professor|أستاذ جامعي|Professeur"],
+      ["Police officer|شرطي|Policier", "Security guard|حارس|Gardien"], ["Chef|طباخ|Chef cuisinier", "Waiter|نادل|Serveur"],
+      ["Pilot|طيار|Pilote", "Ship captain|قبطان|Capitaine"], ["Photographer|مصوّر|Photographe", "Painter|رسّام|Peintre"],
+      ["Singer|مغنٍّ|Chanteur", "Composer|ملحّن|Compositeur"], ["Lawyer|محامٍ|Avocat", "Judge|قاضٍ|Juge"],
+      ["Engineer|مهندس|Ingénieur", "Architect|معماري|Architecte"], ["Carpenter|نجّار|Menuisier", "Blacksmith|حدّاد|Forgeron"],
+      ["Journalist|صحفي|Journaliste", "TV presenter|مذيع|Présentateur"], ["Farmer|فلّاح|Agriculteur", "Fisherman|صيّاد|Pêcheur"],
+      ["Dentist|طبيب أسنان|Dentiste", "Pharmacist|صيدلي|Pharmacien"], ["Firefighter|إطفائي|Pompier", "Paramedic|مسعف|Ambulancier"],
+      ["Barber|حلّاق|Coiffeur", "Tailor|خيّاط|Tailleur"]
+    ] },
+    { id: 'sports', tn: false, label: { en: 'Sports & Games', ar: 'رياضة وألعاب', fr: 'Sports et jeux' }, pairs: [
+      ["Football|كرة القدم|Football", "Rugby|رغبي|Rugby"], ["Basketball|كرة السلة|Basket", "Volleyball|كرة الطائرة|Volley"],
+      ["Tennis|تنس|Tennis", "Ping-pong|تنس الطاولة|Ping-pong"], ["Swimming|سباحة|Natation", "Diving|غوص|Plongée"],
+      ["Boxing|ملاكمة|Boxe", "Karate|كاراتيه|Karaté"], ["Chess|شطرنج|Échecs", "Checkers|داما|Dames"],
+      ["Marathon|ماراثون|Marathon", "Sprint|عدو سريع|Sprint"], ["Cycling|دراجات|Cyclisme", "Skateboarding|تزلج بالعجلات|Skateboard"],
+      ["Goalkeeper|حارس مرمى|Gardien de but", "Referee|حكم|Arbitre"], ["Handball|كرة اليد|Handball", "Water polo|كرة الماء|Water-polo"],
+      ["Skiing|تزلج على الثلج|Ski", "Snowboard|سنوبورد|Snowboard"], ["Playing cards|ورق اللعب|Cartes", "Dominoes|دومينو|Dominos"],
+      ["Gold medal|ميدالية ذهبية|Médaille d'or", "Trophy|كأس|Trophée"]
+    ] },
+    { id: 'nature', tn: false, label: { en: 'Nature & Weather', ar: 'طبيعة وطقس', fr: 'Nature et météo' }, pairs: [
+      ["Sun|شمس|Soleil", "Moon|قمر|Lune"], ["Rain|مطر|Pluie", "Snow|ثلج|Neige"], ["Mountain|جبل|Montagne", "Hill|تلة|Colline"],
+      ["River|نهر|Rivière", "Lake|بحيرة|Lac"], ["Sea|بحر|Mer", "Ocean|محيط|Océan"], ["Thunder|رعد|Tonnerre", "Lightning|برق|Éclair"],
+      ["Fog|ضباب|Brouillard", "Cloud|سحابة|Nuage"], ["Volcano|بركان|Volcan", "Earthquake|زلزال|Séisme"],
+      ["Rose|وردة|Rose", "Tulip|توليب|Tulipe"], ["Tree|شجرة|Arbre", "Bush|شجيرة|Buisson"],
+      ["Olive tree|زيتونة|Olivier", "Palm tree|نخلة|Palmier"], ["Sand|رمل|Sable", "Dust|غبار|Poussière"],
+      ["Rainbow|قوس قزح|Arc-en-ciel", "Sunset|غروب|Coucher de soleil"], ["Wind|رياح|Vent", "Storm|عاصفة|Tempête"],
+      ["Cave|كهف|Grotte", "Cliff|جرف|Falaise"]
+    ] },
+    { id: 'tech', tn: false, label: { en: 'Tech & Media', ar: 'تقنية وترفيه', fr: 'Tech et médias' }, pairs: [
+      ["Laptop|حاسوب محمول|Ordinateur portable", "Desktop computer|حاسوب مكتبي|Ordinateur de bureau"],
+      ["Headphones|سماعات|Écouteurs", "Speaker|مكبر صوت|Enceinte"], ["Camera|كاميرا|Appareil photo", "Camcorder|كاميرا فيديو|Caméscope"],
+      ["Television|تلفاز|Télévision", "Projector|جهاز عرض|Projecteur"], ["Video game|لعبة فيديو|Jeu vidéo", "Board game|لعبة لوحية|Jeu de société"],
+      ["Email|بريد إلكتروني|E-mail", "Text message|رسالة نصية|SMS"], ["Password|كلمة مرور|Mot de passe", "Username|اسم المستخدم|Nom d'utilisateur"],
+      ["Wi-Fi|واي فاي|Wi-Fi", "Bluetooth|بلوتوث|Bluetooth"], ["Charger|شاحن|Chargeur", "Battery|بطارية|Batterie"],
+      ["Keyboard|لوحة مفاتيح|Clavier", "Computer mouse|فأرة|Souris d'ordinateur"], ["Movie|فيلم|Film", "TV series|مسلسل|Série"],
+      ["Podcast|بودكاست|Podcast", "Radio|راديو|Radio"], ["Novel|رواية|Roman", "Comic book|قصة مصورة|Bande dessinée"],
+      ["Selfie|سيلفي|Selfie", "Screenshot|لقطة شاشة|Capture d'écran"], ["Robot|روبوت|Robot", "Drone|درون|Drone"]
+    ] },
+    { id: 'tnfood', tn: true, label: { en: 'Tunisian Food', ar: 'مأكولات تونسية', fr: 'Cuisine tunisienne' }, pairs: [
+      ["Couscous|كسكسي|Couscous", "Mhamsa|محمصة|Mhamsa"], ["Brik|بريك|Brik", "Fricassé|فريكاسي|Fricassé"],
+      ["Lablabi|لبلابي|Lablabi", "Chorba|شربة|Chorba"], ["Ojja|أوجة|Ojja", "Chakchouka|شكشوكة|Chakchouka"],
+      ["Kafteji|كفتاجي|Kafteji", "Mechouia salad|سلطة مشوية|Salade mechouia"], ["Makroudh|مقروض|Makroudh", "Baklawa|بقلاوة|Baklawa"],
+      ["Bambalouni|بمبالوني|Bambalouni", "Zlebia|زلابية|Zlabia"], ["Tea with pine nuts|شاي بالصنوبر|Thé aux pignons", "Arabic coffee|قهوة عربي|Café arabe"],
+      ["Harissa|هريسة|Harissa", "Tabil|تابل|Tabil"], ["Deglet Nour dates|دقلة نور|Dattes Deglet Nour", "Figs|تين|Figues"],
+      ["Mlawi|ملاوي|Mlawi", "Tabouna bread|خبز الطابونة|Pain tabouna"], ["Lben|لبن|Lben", "Yogurt|ياغورت|Yaourt"],
+      ["Assida|عصيدة|Assida", "Bsissa|بسيسة|Bsissa"], ["Merguez|مرقاز|Merguez", "Sausage|نقانق|Saucisse"],
+      ["Tunisian tajine|طاجين|Tajine tunisien", "Quiche|كيش|Quiche"], ["Sfenj|سفنج|Sfenj", "Donut|دونات|Beignet"],
+      ["Mint|نعناع|Menthe", "Verbena|لويزة|Verveine"], ["Pomegranate|رمان|Grenade", "Prickly pear|هندي|Figue de Barbarie"]
+    ] },
+    { id: 'tnplaces', tn: true, label: { en: 'Tunisian Places & Culture', ar: 'أماكن وثقافة تونسية', fr: 'Lieux et culture tunisiens' }, pairs: [
+      ["Sidi Bou Said|سيدي بوسعيد|Sidi Bou Saïd", "La Marsa|المرسى|La Marsa"], ["Carthage|قرطاج|Carthage", "El Jem|الجم|El Jem"],
+      ["Medina of Tunis|المدينة العتيقة|Médina de Tunis", "Souk|سوق|Souk"], ["Djerba|جربة|Djerba", "Hammamet|الحمامات|Hammamet"],
+      ["Douz|دوز|Douz", "Tozeur|توزر|Tozeur"], ["Kairouan|القيروان|Kairouan", "Sousse|سوسة|Sousse"],
+      ["Bardo Museum|متحف باردو|Musée du Bardo", "Carthage Museum|متحف قرطاج|Musée de Carthage"], ["Bizerte|بنزرت|Bizerte", "Tabarka|طبرقة|Tabarka"],
+      ["Jasmine|ياسمين|Jasmin", "Orange blossom|زهر النارنج|Fleur d'oranger"], ["Chechia|شاشية|Chechia", "Fez hat|طربوش|Fez"],
+      ["Mezoued|مزود|Mezoued", "Oud|عود|Oud"], ["Sfax|صفاقس|Sfax", "Gabès|قابس|Gabès"],
+      ["Matmata|مطماطة|Matmata", "Tataouine|تطاوين|Tataouine"], ["Espérance de Tunis|الترجي|Espérance de Tunis", "Club Africain|النادي الإفريقي|Club Africain"],
+      ["Hammam|حمام|Hammam", "Sauna|ساونا|Sauna"], ["Eagles of Carthage|نسور قرطاج|Aigles de Carthage", "Atlas Lions|أسود الأطلس|Lions de l'Atlas"],
+      ["Habib Bourguiba Avenue|شارع الحبيب بورقيبة|Avenue Habib Bourguiba", "Lake of Tunis|بحيرة تونس|Lac de Tunis"]
+    ] },
+    { id: 'tnwords', tn: true, label: { en: 'Tunisian Everyday Words', ar: 'كلمات تونسية', fr: 'Mots tunisiens' }, pairs: [
+      ["Louage (shared taxi)|لواج|Louage", "Taxi|تاكسي|Taxi"], ["Karhba (car)|كرهبة|Karhba (voiture)", "Mobylette (scooter)|موبيلات|Mobylette"],
+      ["Sabbat (shoes)|سباط|Sabbat (chaussures)", "Sandala (sandals)|صندالة|Sandales"], ["Kabbout (coat)|كبوط|Kabbout (manteau)", "Jebba (traditional robe)|جبة|Jebba"],
+      ["Fouta (towel)|فوطة|Fouta (serviette)", "Sponge|إسفنجة|Éponge"], ["Sbitar (hospital)|سبيطار|Sbitar (hôpital)", "Pharmacy|صيدلية|Pharmacie"],
+      ["Houma (neighbourhood)|حومة|Houma (quartier)", "Dar (house)|دار|Dar (maison)"], ["Khobz (bread)|خبز|Khobz (pain)", "Baguette|باقيت|Baguette"],
+      ["Kaskrout (sandwich)|كسكروت|Kaskrout", "Hamburger|هامبورغر|Hamburger"], ["Frigidaire (fridge)|فريجيدار|Frigidaire (frigo)", "Oven|فرن|Four"],
+      ["Tabsi (plate)|طبسي|Tabsi (assiette)", "Kass (glass)|كاس|Kass (verre)"], ["Chkoun (who)|شكون|Chkoun (qui)", "Chnowa (what)|شنوة|Chnowa (quoi)"],
+      ["Sahbi (my friend)|صاحبي|Sahbi (mon pote)", "Khouya (my brother)|خويا|Khouya (mon frère)"], ["Behi (good)|باهي|Behi (bien)", "Mriguel (great)|مريقل|Mriguel (super)"],
+      ["Barcha (a lot)|برشا|Barcha (beaucoup)", "Chwaya (a little)|شوية|Chwaya (un peu)"]
+    ] }
+  ];
+  function pw(s) { var p = s.split('|'); return { en: p[0], ar: p[1], fr: p[2], custom: false }; }
+  var CATS = RAW.map(function (c) {
+    return { id: c.id, tn: c.tn, label: c.label, pairs: c.pairs.map(function (p) { return [pw(p[0]), pw(p[1])]; }) };
+  });
+
+  var STORE = 'aldakhil-v2';
+  var tid = null;
+
+  var S = {
+    lang: 'en', wl: 'en', setOpen: false,
+    sfxOn: true, sfxVol: 70, musicOn: true, musicVol: 40,
+    screen: 'setup', n: 5, names: [], intr: 1, gh: 0, cats: {}, sp: {},
+    customText: '', only: false, err: '', cq: false,
+    players: [], wordC: null, wordI: null, lastPair: '', ri: 0, revealed: false,
+    order: [], round: 1, mime: null,
+    voters: [], vi: 0, ballots: {}, pick: null, res: null,
+    queue: [], cur: null, pend: [], elimOrder: [], ghostWrong: false, ghostGuessed: false,
+    winner: null, gamePts: [], bonus: [], totals: null,
+    hadGhost: false, hadIntr: true, tLeft: 120, tRun: false
+  };
+  CATS.forEach(function (c) { S.cats[c.id] = true; });
+  SPK.forEach(function (id) { S.sp[id] = false; });
+
+  try {
+    var saved = JSON.parse(localStorage.getItem(STORE) || 'null');
+    if (saved) {
+      if (Array.isArray(saved.names)) S.names = saved.names.slice(0, 12).map(String);
+      if (typeof saved.customText === 'string') S.customText = saved.customText;
+      if (saved.n >= 3 && saved.n <= 12) S.n = saved.n | 0;
+      if (LN[saved.lang]) S.lang = saved.lang;
+      if (LN[saved.wl]) S.wl = saved.wl;
+      if (saved.cats && typeof saved.cats === 'object') CATS.forEach(function (c) { if (c.id in saved.cats) S.cats[c.id] = !!saved.cats[c.id]; });
+      if (saved.sp && typeof saved.sp === 'object') SPK.forEach(function (id) { if (id in saved.sp) S.sp[id] = !!saved.sp[id]; });
+      if (typeof saved.sfxOn === 'boolean') S.sfxOn = saved.sfxOn;
+      if (typeof saved.musicOn === 'boolean') S.musicOn = saved.musicOn;
+      if (saved.sfxVol >= 0 && saved.sfxVol <= 100) S.sfxVol = +saved.sfxVol;
+      if (saved.musicVol >= 0 && saved.musicVol <= 100) S.musicVol = +saved.musicVol;
+    }
+  } catch (e) {}
+  (function () { var d = defaults(S.n); S.intr = d.i; S.gh = d.g; })();
+
+  function save() {
+    try {
+      localStorage.setItem(STORE, JSON.stringify({
+        names: S.names, customText: S.customText, n: S.n, lang: S.lang, wl: S.wl, cats: S.cats, sp: S.sp,
+        sfxOn: S.sfxOn, sfxVol: S.sfxVol, musicOn: S.musicOn, musicVol: S.musicVol
+      }));
+    } catch (e) {}
+  }
+  function T(k, v) {
+    var s = I18N[S.lang][k];
+    if (s === undefined) s = I18N.en[k];
+    if (v) for (var x in v) s = s.split('{' + x + '}').join(v[x]);
+    return s;
+  }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function rand(n) { return Math.floor(Math.random() * n); }
+  function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = rand(i + 1); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function fill(n, v) { var a = []; for (var i = 0; i < n; i++) a.push(v); return a; }
+  function norm(s) {
+    return String(s).toLowerCase().normalize('NFD')
+      .replace(/[̀-ًͯ-ٟـ]/g, '')
+      .replace(/\(.*?\)/g, ' ')
+      .replace(/ة/g, 'ه').replace(/ى/g, 'ي')
+      .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+      .replace(/\s+/g, ' ').trim()
+      .replace(/^(al |el |the |a |an |le |la |les |l |un |une |ال)/, '');
+  }
+  function matches(guess, w) {
+    var g = norm(guess);
+    if (!g) return false;
+    return [w.en, w.ar, w.fr].some(function (x) { return norm(x) === g; });
+  }
+  function wd(w) { return w.custom ? w.en : (w[S.wl] || w.en); }
+  function altHtml(w) {
+    if (w.custom) return '';
+    var o = ['ar', 'fr', 'en'].filter(function (l) { return l !== S.wl; }).map(function (l) { return '<span lang="' + l + '" dir="auto">' + esc(w[l]) + '</span>'; });
+    return '<span class="alt">' + o.join(' · ') + '</span>';
+  }
+  function nm(i) { return '<b>' + esc(S.players[i].name) + '</b>'; }
+
+  /* roles: intruders + ghosts must stay a minority */
+  function defaults(n) {
+    if (n <= 5) return { i: 1, g: 0 };
+    if (n <= 7) return { i: 1, g: 1 };
+    if (n <= 9) return { i: 2, g: 1 };
+    return { i: 3, g: 1 };
+  }
+  function maxBad(n) { return Math.ceil(n / 2) - 1; }
+  function clampRoles() {
+    var mb = maxBad(S.n);
+    S.gh = Math.max(0, Math.min(S.gh, mb));
+    S.intr = Math.max(0, Math.min(S.intr, mb - S.gh));
+    if (S.gh + S.intr < 1) S.intr = 1;
+  }
+
+  function parseCustom(t) {
+    return t.split('\n').map(function (l) {
+      return l.split(/\s+[-–—]\s+|\s*[|،,\/]\s*/).map(function (x) { return x.trim(); }).filter(Boolean);
+    }).filter(function (p) { return p.length >= 2; }).map(function (p) {
+      return [{ en: p[0], ar: p[0], fr: p[0], custom: true }, { en: p[1], ar: p[1], fr: p[1], custom: true }];
+    });
+  }
+  function getPool() {
+    var custom = parseCustom(S.customText);
+    if (S.only && custom.length) return custom;
+    var pool = [];
+    CATS.forEach(function (c) { if (S.cats[c.id]) pool = pool.concat(c.pairs); });
+    return pool.concat(custom);
+  }
+  function roleLabel(r) { return T({ c: 'rCitizen', i: 'rIntruder', g: 'rGhost' }[r]); }
+  function findEff(id) {
+    for (var i = 0; i < S.players.length; i++) if (S.players[i].eff === id) return i;
+    return -1;
+  }
+  function counts() {
+    var o = { c: 0, i: 0, g: 0 };
+    S.players.forEach(function (p) { if (p.alive) o[p.role]++; });
+    return o;
+  }
+  function checkWin() {
+    var o = counts(), bad = o.i + o.g;
+    if (bad === 0) return 'c';
+    if (o.c <= bad) return o.i === 0 ? 'g' : 'i';
+    return null;
+  }
+  function pills(o, showI, showG) {
+    var h = '<div class="pills"><span class="pill c"><b>' + o.c + '</b> ' + T('pCitizens') + '</span>';
+    if (showI) h += '<span class="pill i"><b>' + o.i + '</b> ' + T('pIntruders') + '</span>';
+    if (showG) h += '<span class="pill g"><b>' + o.g + '</b> ' + T('pGhost') + '</span>';
+    return h + '</div>';
+  }
+
+  /* ---------- timer ---------- */
+  function stopTimer() { if (tid) clearInterval(tid); tid = null; }
+  function fmt(s) { return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
+  function paintTimer() {
+    var t = document.getElementById('tm'), b = document.getElementById('tmbtn');
+    if (t) { t.textContent = S.tLeft > 0 ? fmt(S.tLeft) : T('timeUp'); t.classList.toggle('done', S.tLeft <= 0); }
+    if (b) b.textContent = S.tRun ? T('tPause') : (S.tLeft > 0 && S.tLeft < 120 ? T('tResume') : T('tStart'));
+  }
+
+  /* ---------- audio: everything is synthesised, no files ---------- */
+  var AU = { ctx: null, sfx: null, mus: null, echo: null, noise: null, timer: null, next: 0, step: 0, deg: 4, unlocked: false };
+  var SC = [293.66, 311.13, 369.99, 392.00, 440.00, 466.16, 523.25, 587.33, 622.25, 739.99, 784.00];
+  var ROOTS = [146.83, 146.83, 196.00, 146.83];
+  var SPB = 60 / 88 / 2;
+
+  function audioInit() {
+    if (AU.ctx) return AU.ctx;
+    var C = window.AudioContext || window.webkitAudioContext;
+    if (!C) return null;
+    try { AU.ctx = new C(); } catch (e) { return null; }
+    var c = AU.ctx;
+    AU.sfx = c.createGain(); AU.sfx.connect(c.destination);
+    AU.mus = c.createGain(); AU.mus.connect(c.destination);
+    var dl = c.createDelay(1.0); dl.delayTime.value = 0.34;
+    var fb = c.createGain(); fb.gain.value = 0.3;
+    var wet = c.createGain(); wet.gain.value = 0.45;
+    dl.connect(fb); fb.connect(dl); dl.connect(wet); wet.connect(AU.mus);
+    AU.echo = dl;
+    applyVol();
+    return c;
+  }
+  function applyVol() {
+    if (!AU.ctx) return;
+    var t = AU.ctx.currentTime;
+    AU.sfx.gain.setTargetAtTime(S.sfxOn ? S.sfxVol / 100 : 0, t, 0.02);
+    AU.mus.gain.setTargetAtTime(S.musicOn ? S.musicVol / 100 * 0.7 : 0, t, 0.08);
+  }
+  function pluck(freq, t, dur, vol) {
+    var c = AU.ctx, o = c.createOscillator(), f = c.createBiquadFilter(), g = c.createGain();
+    o.type = 'triangle'; o.frequency.value = freq;
+    f.type = 'lowpass'; f.frequency.value = 2200;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(f); f.connect(g); g.connect(AU.mus); g.connect(AU.echo);
+    o.start(t); o.stop(t + dur + 0.05);
+  }
+  function thump(t, vol) {
+    var c = AU.ctx, o = c.createOscillator(), g = c.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(120, t); o.frequency.exponentialRampToValueAtTime(48, t + 0.16);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+    o.connect(g); g.connect(AU.mus); o.start(t); o.stop(t + 0.25);
+  }
+  function tick(t, vol) {
+    var c = AU.ctx;
+    if (!AU.noise) {
+      var len = Math.floor(c.sampleRate * 0.08), b = c.createBuffer(1, len, c.sampleRate), d = b.getChannelData(0);
+      for (var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+      AU.noise = b;
+    }
+    var s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    s.buffer = AU.noise; f.type = 'highpass'; f.frequency.value = 5000;
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
+    s.connect(f); f.connect(g); g.connect(AU.mus); s.start(t); s.stop(t + 0.08);
+  }
+  function pad(freq, t, dur, vol) {
+    var c = AU.ctx, o = c.createOscillator(), g = c.createGain();
+    o.type = 'sine'; o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(vol, t + dur * 0.4);
+    g.gain.linearRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(AU.mus); o.start(t); o.stop(t + dur + 0.05);
+  }
+  function scheduleStep(t, st) {
+    var bar = Math.floor(st / 8), pos = st % 8, root = ROOTS[bar];
+    if (pos === 0) { pad(root, t, SPB * 8, 0.07); pad(root * 1.5, t, SPB * 8, 0.035); }
+    if (pos === 0 || pos === 4) { pluck(root / 2, t, 0.6, 0.2); thump(t, 0.3); }
+    if (pos === 1 || pos === 3 || pos === 6) tick(t, 0.07);
+    var play = (st === 28 || st === 30) || (pos % 2 === 0 ? Math.random() < 0.8 : Math.random() < 0.3);
+    if (st === 31) play = false;
+    if (play) {
+      if (st === 28) AU.deg = 3;
+      else if (st === 30) AU.deg = 0;
+      else AU.deg = Math.max(0, Math.min(10, AU.deg + [-2, -1, -1, 0, 1, 1, 2][rand(7)]));
+      pluck(SC[AU.deg], t, SPB * 2.2, 0.13);
+    }
+  }
+  function musicTick() {
+    var c = AU.ctx;
+    if (!c || c.state !== 'running') return;
+    if (AU.next < c.currentTime - 0.5) AU.next = c.currentTime + 0.05;
+    while (AU.next < c.currentTime + 0.3) { scheduleStep(AU.next, AU.step); AU.next += SPB; AU.step = (AU.step + 1) % 32; }
+  }
+  function musicSync() {
+    var c = audioInit();
+    if (!c) return;
+    applyVol();
+    var want = S.musicOn && !document.hidden;
+    if (want) {
+      if (c.state !== 'running') c.resume().catch(function () {});
+      if (!AU.timer) { AU.next = c.currentTime + 0.1; AU.step = 0; AU.timer = setInterval(musicTick, 90); }
+    } else if (AU.timer) { clearInterval(AU.timer); AU.timer = null; }
+  }
+  function beep(f1, f2, t, d, type, vol) {
+    var c = AU.ctx, o = c.createOscillator(), g = c.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(f1, t);
+    if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(g); g.connect(AU.sfx); o.start(t); o.stop(t + d + 0.03);
+  }
+  function sfx(name) {
+    if (!S.sfxOn || !AU.ctx || AU.ctx.state !== 'running') return;
+    var t = AU.ctx.currentTime + 0.005;
+    switch (name) {
+      case 'flip': beep(300, 900, t, 0.16, 'triangle', 0.3); beep(900, 1200, t + 0.12, 0.1, 'sine', 0.2); break;
+      case 'deal': [523.25, 659.25, 783.99].forEach(function (f, i) { beep(f, 0, t + i * 0.07, 0.14, 'triangle', 0.3); }); break;
+      case 'vote': beep(180, 120, t, 0.12, 'square', 0.16); beep(520, 0, t + 0.06, 0.1, 'sine', 0.25); break;
+      case 'elim': beep(260, 70, t, 0.45, 'sawtooth', 0.2); break;
+      case 'win': [523.25, 659.25, 783.99, 1046.5].forEach(function (f, i) { beep(f, 0, t + i * 0.12, 0.25, 'triangle', 0.3); }); break;
+      default: beep(760, 520, t, 0.07, 'sine', 0.35);
+    }
+  }
+  document.addEventListener('click', function (e) {
+    AU.unlocked = true;
+    var c = audioInit();
+    if (c && c.state !== 'running') c.resume().catch(function () {});
+    musicSync();
+    var b = e.target.closest ? e.target.closest('button, [role="switch"]') : null;
+    if (b && !b.disabled) sfx(b.getAttribute('data-sfx') || 'tap');
+  }, true);
+  document.addEventListener('visibilitychange', function () {
+    if (!AU.unlocked || !AU.ctx) return;
+    if (document.hidden) { if (AU.timer) { clearInterval(AU.timer); AU.timer = null; } AU.ctx.suspend().catch(function () {}); }
+    else { AU.ctx.resume().catch(function () {}); musicSync(); }
+  });
+
+  /* ---------- game flow ---------- */
+  function assignSpecials() {
+    var n = S.n;
+    var avail = shuffle(SPK.filter(function (id) { return S.sp[id] && n >= SP[id].min; }));
+    var cap = Math.max(1, n - 1), used = 0, chosen = [];
+    avail.forEach(function (id) { if (used + SP[id].slots <= cap) { chosen.push(id); used += SP[id].slots; } });
+    var seats = shuffle(S.players.map(function (_, i) { return i; }));
+    chosen.forEach(function (id) {
+      var a = seats.pop();
+      S.players[a].sp = id; S.players[a].eff = id;
+      if (SP[id].slots === 2) {
+        var b = seats.pop();
+        S.players[b].sp = id; S.players[b].eff = id;
+        S.players[a].partner = b; S.players[b].partner = a;
+      }
+    });
+    S.players.forEach(function (p) {
+      if (p.sp !== 'seller') return;
+      var cand = SPK.filter(function (id) { return SP[id].solo && n >= SP[id].min && chosen.indexOf(id) < 0; });
+      if (!cand.length) cand = SPK.filter(function (id) { return SP[id].solo && n >= SP[id].min; });
+      p.eff = cand[rand(cand.length)];
+    });
+  }
+
+  function startGame() {
+    S.err = '';
+    var names = [], seen = {};
+    for (var k = 0; k < S.n; k++) {
+      var nmv = (S.names[k] || '').trim() || T('playerN', { n: k + 1 });
+      if (seen[nmv]) { seen[nmv]++; nmv += ' ' + seen[nmv]; } else { seen[nmv] = 1; }
+      names.push(nmv);
+    }
+    var pool = getPool();
+    if (!pool.length) { S.err = T('errPick'); return render(); }
+    var pair, tries = 0, key;
+    do { pair = pool[rand(pool.length)]; key = pair[0].en + '|' + pair[1].en; tries++; } while (pool.length > 1 && key === S.lastPair && tries < 20);
+    S.lastPair = key;
+    var sw = Math.random() < 0.5;
+    S.wordC = sw ? pair[1] : pair[0];
+    S.wordI = sw ? pair[0] : pair[1];
+    var G = S.gh, I = S.intr, C = S.n - I - G;
+    var roles = shuffle(fill(C, 'c').concat(fill(I, 'i'), fill(G, 'g')));
+    S.players = names.map(function (name, i) {
+      var r = roles[i];
+      return { name: name, role: r, alive: true, word: r === 'c' ? S.wordC : (r === 'i' ? S.wordI : null), sp: null, eff: null, partner: null, used: false };
+    });
+    assignSpecials();
+    S.hadGhost = G > 0; S.hadIntr = I > 0;
+    S.round = 1; S.winner = null; S.ghostGuessed = false; S.cq = false;
+    S.elimOrder = []; S.queue = []; S.cur = null; S.pend = []; S.res = null; S.mime = null; S.pick = null;
+    if (!S.totals || S.totals.length !== S.n) S.totals = fill(S.n, 0);
+    S.screen = 'reveal'; S.ri = 0; S.revealed = false;
+    render();
+  }
+
+  function startRound() {
+    var alive = [];
+    S.players.forEach(function (p, i) { if (p.alive) alive.push(i); });
+    var nonG = alive.filter(function (i) { return S.players[i].role !== 'g'; });
+    var pool = nonG.length ? nonG : alive;
+    var start = pool[rand(pool.length)];
+    var k = alive.indexOf(start);
+    S.order = alive.slice(k).concat(alive.slice(0, k));
+    var memeAlive = alive.some(function (i) { return S.players[i].eff === 'meme'; });
+    S.mime = memeAlive ? alive[rand(alive.length)] : null;
+    S.tLeft = 120; S.tRun = false; stopTimer();
+    S.cq = false; S.pick = null;
+  }
+
+  function startVoting() {
+    S.voters = [];
+    S.players.forEach(function (p, i) { if (p.alive || p.eff === 'shadow') S.voters.push(i); });
+    S.vi = 0; S.ballots = {}; S.pick = null; S.cq = false; S.screen = 'vote';
+  }
+
+  function tallyVotes() {
+    var counts = {}, by = {};
+    S.players.forEach(function (p, i) { if (p.alive) { counts[i] = 0; by[i] = []; } });
+    Object.keys(S.ballots).forEach(function (v) { var t = S.ballots[v]; counts[t]++; by[t].push(+v); });
+    var top = -1;
+    Object.keys(counts).forEach(function (k) { if (counts[k] > top) top = counts[k]; });
+    var tied = Object.keys(counts).filter(function (k) { return counts[k] === top; }).map(Number);
+    var q = findEff('queen');
+    var r = { counts: counts, by: by, top: top, tied: tied, kind: 'normal', victim: null, need: null, pickFrom: null, queen: q, boom: null, bounce: null, random: false };
+    if (tied.length > 1) {
+      r.kind = 'tie';
+      if (q >= 0) { r.need = 'queen'; r.pickFrom = tied; }
+    } else {
+      var t = tied[0], tp = S.players[t];
+      if (tp.eff === 'boom' && !tp.used) {
+        tp.used = true;
+        r.kind = 'boom'; r.boom = t;
+        var vs = by[t].filter(function (v) { return S.players[v].alive; });
+        r.bounce = vs.map(function (v) { return { idx: v, n: counts[v] + 1 }; });
+        if (!vs.length) r.kind = 'boom0';
+        else {
+          var bt = Math.max.apply(null, r.bounce.map(function (x) { return x.n; }));
+          var bTied = r.bounce.filter(function (x) { return x.n === bt; }).map(function (x) { return x.idx; });
+          if (bTied.length > 1) {
+            if (q >= 0) { r.need = 'queen'; r.pickFrom = bTied; }
+            else { r.victim = bTied[rand(bTied.length)]; r.random = true; }
+          } else r.victim = bTied[0];
+        }
+      } else r.victim = t;
+    }
+    S.res = r;
+  }
+
+  function afterResult() {
+    var r = S.res;
+    if (r.need === 'queen') { S.pick = null; S.screen = 'queen'; return render(); }
+    if (r.victim === null) return endRound();
+    startElims(r.victim, r.kind === 'boom' ? 'boom' : 'vote');
+  }
+  function startElims(idx, cause) {
+    S.queue = [{ idx: idx, cause: cause }];
+    S.pick = null;
+    processQueue();
+  }
+
+  function processQueue() {
+    while (S.queue.length) {
+      var it = S.queue.shift(), p = S.players[it.idx];
+      if (!p.alive) continue;
+      p.alive = false; S.elimOrder.push(it.idx);
+      if (p.eff === 'lover' && p.partner !== null && S.players[p.partner].alive) S.queue.push({ idx: p.partner, cause: 'love', by: it.idx });
+      S.cur = it; S.pend = []; S.ghostWrong = false; S.pick = null;
+      if (p.role === 'g') S.pend.push('ghost');
+      if (p.eff === 'avenger' && S.players.some(function (x) { return x.alive; })) S.pend.push('avenger');
+      S.screen = 'elim';
+      sfx('elim');
+      return render();
+    }
+    endRound();
+  }
+
+  function endRound() {
+    var w = checkWin();
+    if (w) return finishGame(w);
+    S.round++; startRound(); S.screen = 'discuss'; render();
+  }
+
+  function finishGame(w) {
+    S.winner = w;
+    var pts = S.players.map(function () { return 0; }), notes = S.players.map(function () { return []; });
+    S.players.forEach(function (p, i) {
+      var win = (w === 'c' && p.role === 'c') || (w === 'i' && (p.role === 'i' || (p.role === 'g' && p.alive))) || (w === 'g' && p.role === 'g');
+      if (win) pts[i] += 3;
+    });
+    var f = S.elimOrder[0];
+    if (f !== undefined && S.players[f].eff === 'joy') { pts[f] += 4; notes[f].push('🤪 +4'); }
+    var ds = [];
+    S.players.forEach(function (p, i) { if (p.sp === 'duel') ds.push(i); });
+    if (ds.length === 2) {
+      var e0 = S.elimOrder.indexOf(ds[0]), e1 = S.elimOrder.indexOf(ds[1]), first = -1;
+      if (e0 >= 0 && (e1 < 0 || e0 < e1)) first = 0; else if (e1 >= 0) first = 1;
+      if (first >= 0) {
+        var lo = ds[first], wi = ds[1 - first];
+        pts[lo] -= 2; notes[lo].push('⚔️ −2');
+        pts[wi] += 2; notes[wi].push('⚔️ +2');
+      }
+    }
+    S.gamePts = pts; S.bonus = notes;
+    if (!S.totals || S.totals.length !== pts.length) S.totals = fill(pts.length, 0);
+    pts.forEach(function (x, i) { S.totals[i] += x; });
+    S.screen = 'end';
+    sfx('win');
+    render();
+  }
+
+  /* ---------- views ---------- */
+  function starMark(size) {
+    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.4"><rect x="10" y="10" width="28" height="28"/><rect x="10" y="10" width="28" height="28" transform="rotate(45 24 24)"/></g><circle cx="24" cy="24" r="4" fill="currentColor"/></svg>';
+  }
+  function sw(act, on, label) {
+    return '<button type="button" class="switch" role="switch" data-act="' + act + '" aria-label="' + esc(label) + '" aria-checked="' + on + '"></button>';
+  }
+  function stepper(key, val, lo, hi) {
+    return '<div class="stepper"><button type="button" data-act="' + key + '-" aria-label="−"' + (val <= lo ? ' disabled' : '') + '>−</button>' +
+      '<span class="val">' + val + '</span>' +
+      '<button type="button" data-act="' + key + '+" aria-label="+"' + (val >= hi ? ' disabled' : '') + '>+</button></div>';
+  }
+  function quitBlock() {
+    if (!S.cq) return '<button class="link" type="button" data-act="quit">' + T('quit') + '</button>';
+    return '<div class="confirm"><p>' + T('quitQ') + '</p><div class="btn-pair"><button class="btn danger" type="button" data-act="quityes">' + T('quitYes') + '</button><button class="btn" type="button" data-act="quitno">' + T('quitNo') + '</button></div></div>';
+  }
+  function trRows(w) {
+    return ['ar', 'fr', 'en'].filter(function (l) { return l !== S.wl; }).map(function (l) {
+      return '<div class="tr-row"><span class="tl">' + LN[l] + '</span><span class="tw" lang="' + l + '" dir="auto">' + esc(w[l]) + '</span></div>';
+    }).join('');
+  }
+  function spInfo(p, hidden, label) {
+    if (!p.sp) return '';
+    var r = SP[p.sp], extra = '';
+    if (p.sp === 'lover' && p.partner !== null) extra = '<p>' + T('partnerLover') + ' ' + nm(p.partner) + '</p>';
+    if (p.sp === 'duel' && p.partner !== null) extra = '<p>' + T('partnerDuel') + ' ' + nm(p.partner) + '</p>';
+    if (p.sp === 'seller') {
+      var a = SP[p.eff];
+      extra = '<p>' + T('sellerAbility') + '</p><p><b>' + a.e + ' ' + esc(a.n[S.lang]) + '</b>: ' + esc(a.d[S.lang]) + '</p>';
+    }
+    return '<div class="rolebox" id="rolebox"' + (hidden ? ' hidden' : '') + '><span class="re" aria-hidden="true">' + r.e + '</span><div>' +
+      '<p class="eyebrow">' + label + '</p><h3>' + esc(r.n[S.lang]) + '</h3><p>' + esc(r.d[S.lang]) + '</p>' + extra + '</div></div>';
+  }
+
+  function topBar() {
+    var h = '<div class="topbar"><div class="brand">' + (S.screen === 'setup' ? '' : starMark(22) + '<span>The Intruder</span>') + '</div>' +
+      '<button type="button" class="gear" data-act="settings" aria-expanded="' + S.setOpen + '" aria-controls="setp"><span aria-hidden="true">⚙️</span><span>' + T('settings') + '</span></button></div>';
+    if (!S.setOpen) return h;
+    var langs = ['en', 'ar', 'fr'].map(function (l) {
+      return '<button type="button" class="chip" data-act="lang" data-l="' + l + '" lang="' + l + '" aria-pressed="' + (S.lang === l) + '">' + LN[l] + '</button>';
+    }).join('');
+    function vol(id, which, val, on) {
+      return '<input type="range" id="' + id + '" data-vol="' + which + '" min="0" max="100" step="1" value="' + val + '" aria-label="' + esc(T('volume')) + '"' + (on ? '' : ' disabled') + '>';
+    }
+    return h + '<section class="panel" id="setp"><div class="row"><h2>⚙️ ' + T('settings') + '</h2><button type="button" class="mini" data-act="settings">' + T('settingsClose') + '</button></div>' +
+      '<div><span class="label">🌐 ' + T('language') + '</span><div class="chips" style="margin-top:8px">' + langs + '</div></div>' +
+      '<div class="setrow"><div class="row"><span class="label">🔊 ' + T('sfx') + '</span>' + sw('sfx', S.sfxOn, T('sfx')) + '</div>' + vol('sfxvol', 'sfx', S.sfxVol, S.sfxOn) + '</div>' +
+      '<div class="setrow"><div class="row"><span class="label">🎵 ' + T('music') + '</span>' + sw('music', S.musicOn, T('music')) + '</div>' + vol('musvol', 'music', S.musicVol, S.musicOn) + '</div></section>';
+  }
+
+  function vSetup() {
+    var C = S.n - S.intr - S.gh, mb = maxBad(S.n);
+    var names = '';
+    for (var i = 0; i < S.n; i++) {
+      names += '<label class="nm"><i>' + (i + 1) + '</i><input id="name-' + i + '" data-name="' + i + '" maxlength="16" autocomplete="off" placeholder="' + esc(T('playerN', { n: i + 1 })) + '" value="' + esc(S.names[i] || '') + '"></label>';
+    }
+    var chips = CATS.map(function (c) {
+      return '<button type="button" class="chip' + (c.tn ? ' tn' : '') + '" data-act="cat" data-id="' + c.id + '" aria-pressed="' + (!!S.cats[c.id]) + '">' + esc(c.label[S.lang]) + '</button>';
+    }).join('');
+    var wlChips = ['en', 'ar', 'fr'].map(function (l) {
+      return '<button type="button" class="chip" data-act="wl" data-l="' + l + '" lang="' + l + '" aria-pressed="' + (S.wl === l) + '">' + LN[l] + '</button>';
+    }).join('');
+    var cards = SPK.map(function (id) {
+      var r = SP[id], dis = S.n < r.min, on = !!S.sp[id] && !dis;
+      return '<button type="button" class="sp" data-act="sp" data-id="' + id + '" aria-pressed="' + on + '"' + (dis ? ' disabled' : '') + '>' +
+        '<span class="se" aria-hidden="true">' + r.e + '</span><span class="sn">' + esc(r.n[S.lang]) + '</span>' +
+        '<span class="sd">' + esc(r.d[S.lang]) + '</span>' + (r.min > 3 ? '<span class="sm">' + T('minP', { n: r.min }) + '</span>' : '') + '</button>';
+    }).join('');
+    var cn = parseCustom(S.customText).length;
+    var rules = I18N[S.lang].rules.map(function (r) { return '<li><b>' + r[0] + ':</b> ' + r[1] + '</li>'; }).join('');
+    return '' +
+      '<header class="hero"><div style="color:var(--lemon)">' + starMark(44) + '</div><h1>The Intruder</h1><p>' + T('tagline') + '</p></header>' +
+      '<details class="rules"><summary>' + T('how') + '</summary><ol>' + rules + '</ol></details>' +
+      '<section class="panel"><div class="row"><h2>' + T('players') + '</h2>' + stepper('n', S.n, 3, 12) + '</div><div class="names">' + names + '</div></section>' +
+      '<section class="panel"><h2>' + T('roles') + '</h2>' +
+      '<div class="row"><span class="label">🕵️ ' + T('intruderCount') + '</span>' + stepper('i', S.intr, S.gh > 0 ? 0 : 1, mb) + '</div>' +
+      '<div class="row"><span><span class="label">👻 ' + T('ghostCount') + '</span><br><span class="sub">' + T('ghostSub') + '</span></span>' + stepper('g', S.gh, 0, mb) + '</div>' +
+      pills({ c: C, i: S.intr, g: S.gh }, S.intr > 0, S.gh > 0) + '</section>' +
+      '<section class="panel"><div class="row"><h2>' + T('specH') + '</h2><span><button type="button" class="mini" data-act="allsp">' + T('all') + '</button><button type="button" class="mini" data-act="nonesp">' + T('none') + '</button></span></div>' +
+      '<p class="sub">' + T('specHint') + '</p><div class="spgrid">' + cards + '</div></section>' +
+      '<section class="panel"><h2>' + T('wordsH') + '</h2>' +
+      '<div class="tools"><span class="label">' + T('topics') + '</span><span><button type="button" class="mini" data-act="allc">' + T('all') + '</button><button type="button" class="mini" data-act="nonec">' + T('none') + '</button></span></div>' +
+      '<div class="chips">' + chips + '</div>' +
+      '<p class="sub" id="pcount">' + T('pairsSel', { n: getPool().length }) + '</p>' +
+      '<span class="label">' + T('wordLang') + '</span><div class="chips">' + wlChips + '</div>' +
+      '<label class="label" for="custom">' + T('custom') + '</label>' +
+      '<textarea id="custom" placeholder="' + esc(T('customPh')).replace(/\n/g, '&#10;') + '">' + esc(S.customText) + '</textarea>' +
+      '<p class="sub" id="ccount">' + T('validPairs', { n: cn }) + '</p>' +
+      '<div class="row"><span class="label">' + T('onlyMine') + '</span>' + sw('only', S.only, T('onlyMine')) + '</div></section>' +
+      (S.err ? '<p class="err" role="alert">' + esc(S.err) + '</p>' : '') +
+      '<button class="btn primary" type="button" data-sfx="deal" data-act="start">' + T('deal') + '</button>';
+  }
+
+  function vReveal() {
+    var p = S.players[S.ri], last = S.ri === S.players.length - 1;
+    var back = p.role === 'g'
+      ? '<small>' + T('yourCard') + '</small><strong class="word blank">' + T('noWord') + '</strong><em>' + T('blend') + '</em>'
+      : '<small>' + T('yourWord') + '</small><strong class="word" dir="auto" lang="' + S.wl + '">' + esc(wd(p.word)) + '</strong>';
+    var canTr = p.role !== 'g' && !p.word.custom;
+    var hid = S.revealed ? '' : ' hidden';
+    return '<section class="stage">' +
+      '<p class="eyebrow">' + T('playerOf', { a: S.ri + 1, b: S.players.length }) + '</p>' +
+      '<p class="lead">' + T('handTo') + '</p><h2 class="bigname">' + esc(p.name) + '</h2>' +
+      '<button class="card' + (S.revealed ? ' open' : '') + '" id="card" type="button" data-sfx="flip" data-act="flip" aria-label="' + esc(S.revealed ? T('revealedLbl') : T('revealLbl')) + '">' +
+      '<span class="card-inner"><span class="face front"><span style="color:var(--lemon)">' + starMark(52) + '</span><span>' + T('tapCard') + '</span></span>' +
+      '<span class="face back">' + back + '</span></span></button>' +
+      spInfo(p, !S.revealed, T('yourSpecial')) +
+      '<div class="after">' +
+      (canTr ? '<button class="tr-btn" id="trbtn" type="button" data-act="tr" aria-expanded="false" aria-controls="trp"' + hid + '><span class="ti" aria-hidden="true"><b>A</b><i>ع</i></span><span>' + T('translate') + '</span></button>' +
+        '<div class="tr-panel" id="trp" hidden>' + trRows(p.word) + '</div>' : '') +
+      '<button class="btn primary" id="next" type="button" data-act="next"' + hid + '>' +
+      (last ? T('startDisc') : T('hidePass', { name: esc(S.players[S.ri + 1].name) })) + '</button></div>' +
+      '</section>';
+  }
+
+  function vDiscuss() {
+    var first = S.players[S.order[0]];
+    var lis = S.order.map(function (idx, k) {
+      return '<li' + (k === 0 ? ' class="first"' : '') + '>' + esc(S.players[idx].name) + (idx === S.mime ? ' 🎭' : '') + '</li>';
+    }).join('');
+    var mime = S.mime !== null
+      ? '<div class="mime"><span class="re" aria-hidden="true">🎭</span><div><h3>' + T('mimeTitle') + '</h3><p>' + T('mimeText', { name: nm(S.mime) }) + '</p></div></div>' : '';
+    return '<section class="stage">' +
+      '<p class="eyebrow">' + T('round', { n: S.round }) + '</p>' +
+      '<h2 class="bigname">' + T('starts', { name: esc(first.name) }) + '</h2>' +
+      '<p class="muted">' + T('discHint') + '</p>' + mime +
+      '<ol class="order">' + lis + '</ol>' +
+      pills(counts(), S.hadIntr, S.hadGhost) +
+      '<div class="timer"><output id="tm">02:00</output><button type="button" id="tmbtn" data-act="tm">' + T('tStart') + '</button><button type="button" data-act="tmr">' + T('tReset') + '</button></div>' +
+      '<button class="btn primary" type="button" data-act="tovote">' + T('toVote') + '</button>' +
+      quitBlock() + '</section>';
+  }
+
+  function targetButtons(exclude) {
+    var b = '';
+    S.players.forEach(function (p, i) {
+      if (p.alive && i !== exclude) b += '<button type="button" class="vote" data-act="pick" data-i="' + i + '" aria-pressed="' + (S.pick === i) + '">' + esc(p.name) + '</button>';
+    });
+    return b;
+  }
+
+  function vVote() {
+    var vid = S.voters[S.vi], v = S.players[vid];
+    return '<section class="stage">' +
+      '<p class="eyebrow">' + T('voteOf', { a: S.vi + 1, b: S.voters.length }) + '</p>' +
+      '<p class="lead">' + T('handTo') + '</p><h2 class="bigname">' + esc(v.name) + '</h2>' +
+      (v.alive ? '' : '<p class="msg">👤 ' + T('shadowNote') + '</p>') +
+      '<h3 class="midname">' + T('whoVote') + '</h3>' +
+      '<div class="votes">' + targetButtons(vid) + '</div>' +
+      '<button class="btn danger" type="button" data-sfx="vote" data-act="vconfirm"' + (S.pick === null ? ' disabled' : '') + '>' + (S.pick === null ? T('pickOne') : T('confirmVote')) + '</button>' +
+      (S.vi === 0 ? '<button class="link" type="button" data-act="back">' + T('backDisc') + '</button>' : '') +
+      '</section>';
+  }
+
+  function vResult() {
+    var r = S.res;
+    var rows = Object.keys(r.counts).map(Number).sort(function (a, b) { return r.counts[b] - r.counts[a]; });
+    var topList = r.kind === 'tie' ? r.tied : [r.boom !== null ? r.boom : r.victim];
+    var list = rows.map(function (i) {
+      var voters = r.by[i].map(function (v) { return esc(S.players[v].name); }).join(', ');
+      return '<li' + (topList.indexOf(i) >= 0 ? ' class="top"' : '') + '><span class="who">' + esc(S.players[i].name) + (voters ? '<small>' + voters + '</small>' : '') + '</span><span class="n">' + r.counts[i] + '</span></li>';
+    }).join('');
+    var msg;
+    if (r.kind === 'tie') msg = r.need === 'queen' ? T('tieQueen', { queen: nm(r.queen), list: r.tied.map(nm).join(', ') }) : T('tieNone');
+    else if (r.kind === 'normal') msg = T('mostVotes', { name: nm(r.victim) });
+    else if (r.kind === 'boom0') msg = T('boomMsg', { name: nm(r.boom) }) + ' ' + T('boomNone');
+    else msg = T('boomMsg', { name: nm(r.boom) }) + ' ' + (r.need === 'queen' ? T('boomQueen', { queen: nm(r.queen) }) : (r.random ? T('boomRandom', { name: nm(r.victim) }) : T('boomHit', { name: nm(r.victim) })));
+    var rb = '';
+    if (r.bounce && r.bounce.length) {
+      rb = '<p class="eyebrow">🪃 ' + T('rebound') + '</p><ul class="tally">' + r.bounce.map(function (x) {
+        return '<li><span class="who">' + esc(S.players[x.idx].name) + '</span><span class="n">' + x.n + '</span></li>';
+      }).join('') + '</ul>';
+    }
+    return '<section class="stage"><p class="eyebrow">' + T('round', { n: S.round }) + '</p><h2 class="bigname">' + T('results') + '</h2>' +
+      '<ul class="tally">' + list + '</ul>' + rb + '<p class="msg">' + msg + '</p>' +
+      '<button class="btn primary" type="button" data-act="rcont">' + T('cont') + '</button></section>';
+  }
+
+  function vQueen() {
+    var q = S.players[S.res.queen], pk = S.pick, btns = '';
+    S.res.pickFrom.forEach(function (i) {
+      btns += '<button type="button" class="vote" data-act="pick" data-i="' + i + '" aria-pressed="' + (pk === i) + '">' + esc(S.players[i].name) + '</button>';
+    });
+    return '<section class="stage"><p class="eyebrow">👑 ' + T('queenH') + '</p><h2 class="bigname">' + esc(q.name) + '</h2>' +
+      '<p class="muted">' + T('queenPick') + '</p><div class="votes">' + btns + '</div>' +
+      '<button class="btn danger" type="button" data-act="qok"' + (pk === null ? ' disabled' : '') + '>' + (pk === null ? T('pickOne') : T('elimBtn', { name: esc(S.players[pk].name) })) + '</button></section>';
+  }
+
+  function vElim() {
+    var it = S.cur, p = S.players[it.idx], a = S.pend[0];
+    var by = it.by !== undefined ? esc(S.players[it.by].name) : '';
+    var cause = { vote: T('causeVote'), boom: T('causeBoom'), love: T('causeLove', { name: by }), revenge: T('causeRevenge', { name: by }) }[it.cause];
+    var h = '<section class="stage"><p class="eyebrow">' + T('elimTitle') + '</p><h2 class="bigname">' + esc(p.name) + '</h2>' +
+      '<p class="muted">' + cause + '</p>' +
+      '<div class="verdict ' + p.role + '"><span>' + T('was') + '</span><strong>' + roleLabel(p.role) + '</strong></div>' +
+      (p.role === 'g'
+        ? '<p class="muted">' + T('noWordHad') + '</p>'
+        : '<p class="muted">' + T('theirWord') + ' <b style="color:var(--text)" dir="auto">' + esc(wd(p.word)) + '</b>' + altHtml(p.word) + '</p>') +
+      spInfo(p, false, T('specialRole'));
+    if (a === 'ghost') {
+      h += '<form class="guess" data-form="guess"><label for="guess">' + T('ghostQ') + '</label>' +
+        '<input id="guess" autocomplete="off" required><button class="btn primary" type="submit">' + T('guess') + '</button></form>';
+    } else if (a === 'avenger') {
+      h += '<div class="guess"><p>🗡️ ' + T('avengerQ') + '</p><div class="votes">' + targetButtons(-1) + '</div>' +
+        '<button class="btn danger" type="button" data-act="avok"' + (S.pick === null ? ' disabled' : '') + '>' + (S.pick === null ? T('pickOne') : T('elimBtn', { name: esc(S.players[S.pick].name) })) + '</button>' +
+        '<button class="btn" type="button" data-act="avskip">' + T('avengerSkip') + '</button></div>';
+    } else {
+      if (S.ghostWrong) h += '<p class="err">' + T('wrongGuess') + '</p>';
+      h += '<button class="btn primary" type="button" data-act="cont">' + T('cont') + '</button>';
+    }
+    return h + '</section>';
+  }
+
+  function vEnd() {
+    var o = counts();
+    var W = {
+      c: [T('cWin'), T('cWinSub')],
+      i: [T('iWin'), o.g > 0 ? T('iWinSubG') : T('iWinSub')],
+      g: [T('gWin'), S.ghostGuessed ? T('gWinSubG') : T('gWinSubH')]
+    }[S.winner];
+    var roster = S.players.map(function (p, i) {
+      var g = S.gamePts[i], notes = S.bonus[i].length ? '<small>' + S.bonus[i].join(' ') + '</small>' : '';
+      return '<li class="' + (p.alive ? '' : 'out') + '"><span class="who">' + esc(p.name) + (p.sp ? ' ' + SP[p.sp].e : '') +
+        '<small dir="auto">' + (p.role === 'g' ? T('noWord') : esc(wd(p.word))) + '</small>' + notes + '</span>' +
+        '<span class="tag ' + p.role + '">' + roleLabel(p.role) + '</span>' +
+        '<span class="pt"><b>' + (g > 0 ? '+' : (g < 0 ? '−' : '')) + Math.abs(g) + '</b><small>' + T('totalLbl', { n: S.totals[i] }) + '</small></span></li>';
+    }).join('');
+    return '<section class="stage"><p class="eyebrow">' + T('over') + '</p>' +
+      '<h2 class="winner ' + S.winner + '">' + W[0] + '</h2><p class="muted">' + W[1] + '</p>' +
+      '<div class="words"><span class="c">' + T('cWord') + ': <b dir="auto">' + esc(wd(S.wordC)) + '</b>' + altHtml(S.wordC) + '</span>' +
+      (S.hadIntr ? '<span class="i">' + T('iWord') + ': <b dir="auto">' + esc(wd(S.wordI)) + '</b>' + altHtml(S.wordI) + '</span>' : '') + '</div>' +
+      '<h3 class="midname">' + T('scores') + '</h3><ul class="roster">' + roster + '</ul>' +
+      '<button class="btn primary" type="button" data-act="again">' + T('again') + '</button>' +
+      '<button class="btn" type="button" data-act="tosetup">' + T('settingsBtn') + '</button></section>';
+  }
+
+  /* ---------- render + events ---------- */
+  var lastKey = '';
+  function render() {
+    if (S.screen !== 'discuss') { stopTimer(); S.tRun = false; }
+    var views = { setup: vSetup, reveal: vReveal, discuss: vDiscuss, vote: vVote, result: vResult, queen: vQueen, elim: vElim, end: vEnd };
+    app.setAttribute('dir', S.lang === 'ar' ? 'rtl' : 'ltr');
+    app.setAttribute('lang', S.lang);
+    app.innerHTML = topBar() + views[S.screen]() + '<footer class="credit">' + starMark(16) + '<span>Omar Rebai</span></footer>';
+    if (S.screen === 'discuss') paintTimer();
+    var k = [S.screen, S.ri, S.vi, S.round, S.cur ? S.cur.idx : '', S.pend.length].join(':');
+    if (k !== lastKey) { lastKey = k; window.scrollTo(0, 0); }
+  }
+
+  function act(a, el) {
+    var d = function (n) { return el.getAttribute(n); };
+    switch (a) {
+      case 'settings': S.setOpen = !S.setOpen; return render();
+      case 'lang':
+        S.lang = d('data-l');
+        if (S.screen === 'setup') S.wl = S.lang;
+        save(); return render();
+      case 'sfx': S.sfxOn = !S.sfxOn; applyVol(); save(); return render();
+      case 'music': S.musicOn = !S.musicOn; musicSync(); save(); return render();
+      case 'wl': S.wl = d('data-l'); save(); return render();
+      case 'n+': case 'n-':
+        S.n = Math.min(12, Math.max(3, S.n + (a === 'n+' ? 1 : -1)));
+        var df = defaults(S.n); S.intr = df.i; S.gh = df.g; clampRoles(); save(); return render();
+      case 'i+': S.intr++; if (S.intr + S.gh > maxBad(S.n) && S.gh > 0) S.gh--; clampRoles(); return render();
+      case 'i-': S.intr--; clampRoles(); return render();
+      case 'g+': S.gh++; if (S.intr + S.gh > maxBad(S.n) && S.intr > 0) S.intr--; clampRoles(); return render();
+      case 'g-': S.gh--; clampRoles(); return render();
+      case 'cat': S.cats[d('data-id')] = !S.cats[d('data-id')]; save(); return render();
+      case 'allc': CATS.forEach(function (c) { S.cats[c.id] = true; }); save(); return render();
+      case 'nonec': CATS.forEach(function (c) { S.cats[c.id] = false; }); save(); return render();
+      case 'sp': S.sp[d('data-id')] = !S.sp[d('data-id')]; save(); return render();
+      case 'allsp': SPK.forEach(function (id) { S.sp[id] = true; }); save(); return render();
+      case 'nonesp': SPK.forEach(function (id) { S.sp[id] = false; }); save(); return render();
+      case 'only': S.only = !S.only; return render();
+      case 'start': S.totals = null; return startGame();
+      case 'flip':
+        if (!S.revealed) {
+          S.revealed = true;
+          el.classList.add('open');
+          el.setAttribute('aria-label', T('revealedLbl'));
+          ['next', 'trbtn', 'rolebox'].forEach(function (id) { var x = document.getElementById(id); if (x) x.hidden = false; });
+        }
+        return;
+      case 'tr':
+        var pn = document.getElementById('trp');
+        if (pn) { pn.hidden = !pn.hidden; el.setAttribute('aria-expanded', String(!pn.hidden)); }
+        return;
+      case 'next':
+        if (S.ri === S.players.length - 1) { startRound(); S.screen = 'discuss'; }
+        else { S.ri++; S.revealed = false; }
+        return render();
+      case 'tm':
+        if (S.tRun) { stopTimer(); S.tRun = false; }
+        else {
+          if (S.tLeft <= 0) S.tLeft = 120;
+          S.tRun = true;
+          tid = setInterval(function () {
+            S.tLeft--;
+            if (S.tLeft <= 0) { S.tLeft = 0; S.tRun = false; stopTimer(); }
+            paintTimer();
+          }, 1000);
+        }
+        return paintTimer();
+      case 'tmr': stopTimer(); S.tRun = false; S.tLeft = 120; return paintTimer();
+      case 'tovote': startVoting(); return render();
+      case 'back': S.screen = 'discuss'; S.cq = false; return render();
+      case 'pick': S.pick = +d('data-i'); return render();
+      case 'vconfirm':
+        if (S.pick === null) return;
+        S.ballots[S.voters[S.vi]] = S.pick; S.pick = null; S.vi++;
+        if (S.vi >= S.voters.length) { tallyVotes(); S.screen = 'result'; }
+        return render();
+      case 'rcont': return afterResult();
+      case 'qok':
+        if (S.pick === null) return;
+        S.res.victim = S.pick; S.res.need = null;
+        return startElims(S.pick, S.res.kind === 'boom' ? 'boom' : 'vote');
+      case 'avok':
+        if (S.pick === null) return;
+        S.queue.unshift({ idx: S.pick, cause: 'revenge', by: S.cur.idx });
+        S.pend.shift();
+        return processQueue();
+      case 'avskip': S.pend.shift(); return processQueue();
+      case 'cont': return processQueue();
+      case 'again': return startGame();
+      case 'tosetup': S.screen = 'setup'; S.err = ''; S.totals = null; return render();
+      case 'quit': S.cq = true; return render();
+      case 'quitno': S.cq = false; return render();
+      case 'quityes': S.screen = 'setup'; S.cq = false; S.totals = null; return render();
+    }
+  }
+
+  app.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-act]');
+    if (!b || b.disabled) return;
+    act(b.getAttribute('data-act'), b);
+  });
+  app.addEventListener('input', function (e) {
+    var t = e.target, vol = t.getAttribute('data-vol');
+    if (vol) {
+      if (vol === 'sfx') S.sfxVol = +t.value; else S.musicVol = +t.value;
+      applyVol(); save(); return;
+    }
+    if (t.getAttribute('data-name') !== null) { S.names[+t.getAttribute('data-name')] = t.value; save(); }
+    else if (t.id === 'custom') {
+      S.customText = t.value; save();
+      var c = document.getElementById('ccount');
+      if (c) c.textContent = T('validPairs', { n: parseCustom(S.customText).length });
+      var pc = document.getElementById('pcount');
+      if (pc) pc.textContent = T('pairsSel', { n: getPool().length });
+    }
+  });
+  app.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (e.target.getAttribute('data-form') !== 'guess') return;
+    var v = document.getElementById('guess').value;
+    if (matches(v, S.wordC)) { S.ghostGuessed = true; return finishGame('g'); }
+    S.ghostWrong = true; S.pend.shift();
+    render();
+  });
+
+  render();
+})();
+</script>
+
+</body></html>
